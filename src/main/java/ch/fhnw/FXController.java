@@ -50,7 +50,7 @@ class FXController {
     private void handlerGenerateNewMapButtonAction() {
         int mapIndex = view.getOriginalMapComboBox().getSelectionModel().getSelectedIndex();
         map = model.createOriginalMap(mapIndex);
-        view.setSimulationMap(map);
+        view.setMap(map);
         view.showSimulationMap();
     }
 
@@ -66,7 +66,7 @@ class FXController {
         view.setMapFeatureToggleGroupDisabled(false);
         int mapSize = view.getMapSizeSpinner().getValue();
         map = model.createNewMap(mapSize);
-        view.setSimulationMap(map);
+        view.setMap(map);
         view.showSimulationMap();
     }
 
@@ -80,14 +80,17 @@ class FXController {
             dijkstra.step();
         }
         ArrayList<Cell> shortestPath = dijkstra.getShortestPath();
+
         if (shortestPath != null) {
             shortestPath.forEach(cell -> {
                 view.appendOutputText(cell.getCell_Index().i + " : " + cell.getCell_Index().j);
             });
             view.setPath(shortestPath);
+            view.drawPath();
+        }else{
+            view.appendOutputText("No path found");
         }
 
-        view.drawPath();
     }
 
     void show() {

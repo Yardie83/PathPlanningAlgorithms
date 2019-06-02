@@ -42,7 +42,7 @@ class FXView {
     private CheckBox confidenceCheckbox;
     private ToggleGroup mapTypeToggleGroup;
     private Button generateOriginalMapsButton;
-    private SimulationMap simulationMap;
+    private SimulationMap map;
     private GridPane centerPane;
     private Button clearAllMapFeaturesButton;
     private ToggleGroup allowDiagonalToggleGroup;
@@ -65,7 +65,7 @@ class FXView {
 
         BorderPane borderPane = new BorderPane(centerPane, null, rightPane, bottomPane, null);
         Scene scene = new Scene(borderPane);
-        scene.getStylesheets().add(getClass().getResource("fxapp.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("../../fxapp.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("OBI Path Planning");
     }
@@ -406,31 +406,31 @@ class FXView {
         confidenceCheckbox.setSelected(selected);
     }
 
-    void setSimulationMap(SimulationMap simulationMap) {
-        this.simulationMap = simulationMap;
+    void setMap(SimulationMap map) {
+        this.map = map;
 
     }
 
     void showSimulationMap() {
-        if (simulationMap != null) {
+        if (map != null) {
             centerPane.getChildren().clear();
             double paneWidth = centerPane.getWidth();
             double paneHeight = centerPane.getHeight();
-            double height = paneHeight / simulationMap.getGrid().size();
-            double width = paneWidth / simulationMap.getGrid().size();
+            double height = paneHeight / map.getGrid().size();
+            double width = paneWidth / map.getGrid().size();
 
-            for (int i = 0; i < simulationMap.getGrid().size(); i++) {
-                for (int j = 0; j < simulationMap.getGrid().get(i).size(); j++) {
+            for (int i = 0; i < map.getGrid().size(); i++) {
+                for (int j = 0; j < map.getGrid().get(i).size(); j++) {
                     Label label = new Label(i + " " + j);
                     label.setPrefSize(height, width);
                     Pane pane = new Pane();
                     int row = i;
                     int col = j;
                     pane.getStyleClass().add("cell-style");
-                    if (simulationMap.getGrid().get(row).get(col).isWall()) {
+                    if (map.getGrid().get(row).get(col).isWall()) {
                         pane.getStyleClass().add("wall");
                     }
-                    if (simulationMap.getGrid().get(row).get(col).isCheckPoint()) {
+                    if (map.getGrid().get(row).get(col).isCheckPoint()) {
                         pane.getStyleClass().add("checkpoint");
                     }
                     pane.setMaxSize(height, width);
@@ -450,25 +450,32 @@ class FXView {
             MouseButton mouseButton = e.getButton();
             if (mouseButton == MouseButton.PRIMARY) {
                 if (addWallsToggleButton.isSelected()) {
-                    simulationMap.getGrid().get(row).get(col).setWall(true);
-                    simulationMap.getGrid().get(row).get(col).setCheckPoint(false);
+                    map.getGrid().get(row).get(col).setWall(true);
+                    map.getGrid().get(row).get(col).setCheckPoint(false);
+                    pane.getStyleClass().removeAll("path");
                     pane.getStyleClass().add("wall");
                 } else if (addCheckpointsToggleButton.isSelected()) {
-                    simulationMap.getGrid().get(row).get(col).setWall(false);
-                    simulationMap.getGrid().get(row).get(col).setCheckPoint(true);
+                    map.getGrid().get(row).get(col).setWall(false);
+                    map.getGrid().get(row).get(col).setCheckPoint(true);
+                    pane.getStyleClass().removeAll("path");
                     pane.getStyleClass().add("checkpoint");
                 }
             } else {
-                simulationMap.getGrid().get(row).get(col).setWall(false);
+                map.getGrid().get(row).get(col).setWall(false);
                 pane.getStyleClass().removeAll("wall");
-                simulationMap.getGrid().get(row).get(col).setCheckPoint(false);
+                map.getGrid().get(row).get(col).setCheckPoint(false);
                 pane.getStyleClass().removeAll("checkpoint");
             }
         }
     }
 
     void drawPath() {
-        simulationMap.getPath().forEach(cell -> {
+        centerPane.getChildren().forEach(node -> {
+            Pane pane = (Pane) node;
+            pane.getStyleClass().removeAll("path");
+        });
+
+        map.getPath().forEach(cell -> {
             Pane pane =(Pane) getNodeFromGridPane(centerPane, cell.getCell_Index().i, cell.getCell_Index().j);
             if (pane !=null) {
                 pane.getStyleClass().add("path");
@@ -486,7 +493,7 @@ class FXView {
     }
 
     void setPath(ArrayList<Cell> shortestPath) {
-    simulationMap.setPath(shortestPath);
+    map.setPath(shortestPath);
     }
 }
 

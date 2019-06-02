@@ -4,6 +4,7 @@ import ch.fhnw.util.Pair;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 public class Dijkstra {
 
@@ -61,15 +62,17 @@ public class Dijkstra {
         }
     }
 
-    ArrayList<Cell> getShortestPath() {
+    ArrayList<Cell> getShortestPath()   {
 
-        ArrayList<Cell> path = new ArrayList<>();
+        ArrayList<Cell> path = null;
 
         Cell target = map.getGrid().get(map.getGrid().size() - 1).get(map.getGrid().size() - 1);
 
-        path.add(target);
-
         Cell currentCell = target;
+        if (currentCell.getCameFrom() != null) {
+            path = new ArrayList<>();
+            path.add(target);
+        }
 
         while (currentCell.getCameFrom() != null) {
             currentCell = currentCell.getCameFrom();
@@ -102,12 +105,12 @@ public class Dijkstra {
             minIndex = -1;
         } else {
             final ListIterator<Cell> itr = openList.listIterator();
-            Cell min = itr.next(); // first element as the current minimum
+            Cell current = itr.next(); // first element as the current minimum
             minIndex = itr.previousIndex();
             while (itr.hasNext()) {
                 final Cell next = itr.next();
-                if (next.getDistance() < min.getDistance()) {
-                    min = next;
+                if (next.getDistance() < current.getDistance()) {
+                    current = next;
                     minIndex = itr.previousIndex();
                 }
             }
@@ -145,7 +148,6 @@ public class Dijkstra {
         return Math.abs(a.getCell_Index().i - b.getCell_Index().i) + Math.abs(a.getCell_Index().j - b.getCell_Index().j);
     }
 
-
     private ArrayList<Cell> populateNeighbours(Cell currentCell) {
 
         ArrayList<Cell> neighbours = new ArrayList<>();
@@ -179,5 +181,4 @@ public class Dijkstra {
         return map.getGrid().get(i).get(j);
 
     }
-
 }

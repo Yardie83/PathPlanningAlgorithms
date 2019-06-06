@@ -1,5 +1,7 @@
 package ch.fhnw;
 
+import ch.fhnw.Pathfinder.Pathfinder;
+import ch.fhnw.Pathfinder.PathfinderFactory;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Button;
 import javafx.scene.control.Toggle;
@@ -11,7 +13,8 @@ class FXController {
 
     private final FXView view;
     private final FXModel model;
-    private SimulationMap map;
+    private Map map;
+    private Pathfinder pathfinder;
 
     FXController(FXModel model, FXView view) {
         this.view = view;
@@ -28,11 +31,11 @@ class FXController {
 
         //... New Map options
         Button generateOriginalMapsButton = view.getGenerateOriginalMapsButton();
-        generateOriginalMapsButton.setOnAction(e -> handlerGenerateNewMapButtonAction());
+        generateOriginalMapsButton.setOnAction(e -> handlerGenerateOriginalMapButtonAction());
         Button generateNewMapButton = view.getGenerateNewMapButton();
-        generateNewMapButton.setOnAction(e -> handleGenerateButtonAction());
+        generateNewMapButton.setOnAction(e -> handleGenerateNewMapButtonAction());
         Button clearAllMapFeaturesButton = view.getClearAllMapFeatureButton();
-        clearAllMapFeaturesButton.setOnAction(e -> handleGenerateButtonAction());
+        clearAllMapFeaturesButton.setOnAction(e -> handleGenerateNewMapButtonAction());
 
         //Emotion Options UI Controls and EventHandlers
         Button selectAllEmotionButton = view.getSelectAllEmotionButton();
@@ -44,14 +47,34 @@ class FXController {
         // Simulation Options UI Controls and EventHandlers
         Button runButton = view.getRunButton();
         runButton.setOnAction(e -> handleRunButtonAction());
+        Button stepButton = view.getStepButton();
+        stepButton.setOnAction(e -> handleStepButtonAction());
 
     }
 
-    private void handlerGenerateNewMapButtonAction() {
+    //  Generate a original map
+    private void handlerGenerateOriginalMapButtonAction() {
         int mapIndex = view.getOriginalMapComboBox().getSelectionModel().getSelectedIndex();
         map = model.createOriginalMap(mapIndex);
+        setMap();
+        showMap();
+    }
+
+    //    Generate a new map
+    private void handleGenerateNewMapButtonAction() {
+        view.setMapFeatureToggleGroupDisabled(false);
+        int mapSize = view.getMapSizeSpinner().getValue();
+        map = model.createNewMap(mapSize);
+        setMap();
+        showMap();
+    }
+
+    private void setMap() {
         view.setMap(map);
-        view.showSimulationMap();
+    }
+
+    private void showMap() {
+        view.showMap();
     }
 
     private void handleSelectAllEmotionAction() {
@@ -62,35 +85,86 @@ class FXController {
         view.setAllEmotionCheckBox(false);
     }
 
-    private void handleGenerateButtonAction() {
-        view.setMapFeatureToggleGroupDisabled(false);
-        int mapSize = view.getMapSizeSpinner().getValue();
-        map = model.createNewMap(mapSize);
-        view.setMap(map);
-        view.showSimulationMap();
-    }
-
     private void handleRunButtonAction() {
+//     Get all the user options (Emotion options, Simulation options)
 
+//        Emotion options
+
+//        Simulation options
+        String algorithm = view.getAlgorithmComboBox().getSelectionModel().getSelectedItem();
         boolean allowDiagonals = (boolean) view.getAllowDiagonalToggleGroup().getSelectedToggle().getUserData();
         int heuristic = (int) view.getHeuristicToggleGroup().getSelectedToggle().getUserData();
+        boolean visualize = view.getVisualizeCheckbox().isSelected();
+        double stepDelay = view.getStepDelaySlider().getValue();
 
-        Dijkstra dijkstra = new Dijkstra(map, 0, 0, allowDiagonals, heuristic);
-        while (dijkstra.isRunning) {
-            dijkstra.step();
+        //TODO: Make start and goal dynamic
+
+        int start_i = 0;
+        int start_j = 0;
+        int target_i = 0;
+        int target_j = 0;
+
+        pathfinder = PathfinderFactory.getPathfinder(algorithm);
+        if (pathfinder != null) {
+            pathfinder.setAllowDiagonals(allowDiagonals);
+            pathfinder.setAllowCrossingCorners(true);
+            pathfinder.setHeuristic(heuristic);
+            if (map == null) {
+                appendOutputText("Generate a map first");
+                return;
+            } else {
+                pathfinder.setMap(map);
+                pathfinder.init();
+            }
+            if (start_i < 0 || start_j < 0) {
+                appendOutputText("Add a start point");
+                return;
+            } else {
+                pathfinder.setStart(0, 0);
+            }
+            if (target_i < 0 || target_j < 0) {
+                appendOutputText("Add a target point");
+                return;
+            } else {
+                pathfinder.setTarget(map.getGrid().size() - 1, map.getGrid().size() - 1);
+            }
+            runSimulation();
         }
-        ArrayList<Cell> shortestPath = dijkstra.getShortestPath();
+    }
 
+    private void handleStepButtonAction(){
+        handleRunButtonAction();
+        if (pathfinder.isRunning) {
+            pathfinder.step();
+            view.updateMap();
+            drawShortestPath();
+        }
+    }
+
+    private void runSimulation( ) {
+        while (pathfinder.isRunning) {
+            pathfinder.step();
+            view.updateMap();
+            drawShortestPath();
+        }
+//        drawShortestPath(pathfinder);
+    }
+
+    private void drawShortestPath( ) {
+        ArrayList<Cell> shortestPath = pathfinder.getShortestPath();
         if (shortestPath != null) {
             shortestPath.forEach(cell -> {
-                view.appendOutputText(cell.getCell_Index().i + " : " + cell.getCell_Index().j);
+                appendOutputText(cell.getIndex().i + " : " + cell.getIndex().j);
             });
             view.setPath(shortestPath);
             view.drawPath();
-        }else{
+        } else {
             view.appendOutputText("No path found");
         }
+    }
 
+    private void appendOutputText(String text) {
+        view.appendOutputText(text);
     }
 
     void show() {

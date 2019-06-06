@@ -1,5 +1,6 @@
 package ch.fhnw;
 
+import ch.fhnw.util.Algorithm;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -24,15 +25,12 @@ class FXView {
     private final Stage stage;
     private Button runButton;
     private Button generateNewMapButton;
-    private final int HEIGHT = 800;
-    private final int WIDTH = 800;
     private TextArea textArea;
     private CheckBox visualizeCheckbox;
     private Spinner<Integer> mapSizeSpinner;
     private ComboBox<String> originalMapComboBox;
     private ToggleButton addWallsToggleButton;
     private ToggleButton addCheckpointsToggleButton;
-    private boolean useNewMap;
     private ToggleGroup mapFeaturesToggleGroup;
     private Button selectAllEmotionButton;
     private Button clearAllEmotionButton;
@@ -42,20 +40,25 @@ class FXView {
     private CheckBox confidenceCheckbox;
     private ToggleGroup mapTypeToggleGroup;
     private Button generateOriginalMapsButton;
-    private SimulationMap map;
+    private Map map;
     private GridPane centerPane;
     private Button clearAllMapFeaturesButton;
     private ToggleGroup allowDiagonalToggleGroup;
     private ToggleGroup heuristicToggleGroup;
+    private ComboBox<String> algorithmComboBox;
+    private Slider stepDelaySlider;
+    private ToggleButton addStartPositionToggleButton;
+    private ToggleButton addTargetPositionToggleButton;
+    private final int HEIGHT = 600;
+    private final int WIDTH = 600;
+    private boolean useNewMap;
+    private Button stepButton;
 
     FXView(Stage stage, FXModel fxModel) {
         this.stage = stage;
         this.fxModel = fxModel;
-
         this.useNewMap = false;
-
         createLayout();
-
     }
 
     private void createLayout() {
@@ -149,22 +152,37 @@ class FXView {
         mapFeaturesToggleGroup = new ToggleGroup();
         addWallsToggleButton = new ToggleButton("Add Walls");
         addWallsToggleButton.setDisable(true);
+        addWallsToggleButton.setPrefWidth(100);
         addWallsToggleButton.getStyleClass().addAll("button-primary", "btn-green");
         addCheckpointsToggleButton = new ToggleButton("Add Checkpoints");
         addCheckpointsToggleButton.setDisable(true);
         addCheckpointsToggleButton.getStyleClass().addAll("button-primary", "btn-green");
         addWallsToggleButton.setToggleGroup(mapFeaturesToggleGroup);
         addCheckpointsToggleButton.setToggleGroup(mapFeaturesToggleGroup);
+        addStartPositionToggleButton = new ToggleButton("Add Start point");
+        addStartPositionToggleButton.setDisable(true);
+        addStartPositionToggleButton.getStyleClass().addAll("button-primary", "btn-green");
+        addStartPositionToggleButton.setToggleGroup(mapFeaturesToggleGroup);
+        addTargetPositionToggleButton = new ToggleButton("Add Target point");
+        addTargetPositionToggleButton.setDisable(true);
+        addTargetPositionToggleButton.getStyleClass().addAll("button-primary", "btn-green");
+        addTargetPositionToggleButton.setToggleGroup(mapFeaturesToggleGroup);
         clearAllMapFeaturesButton = new Button("Clear All");
         clearAllMapFeaturesButton.getStyleClass().addAll("button-primary");
         clearAllMapFeaturesButton.setDisable(true);
-
         Text wallsCheckPointInstructionsText = new Text("Left click/drag to add, right click/drag to delete");
 
 
         HBox originalMapButtonBox = new HBox(2, originalMapComboBox, generateOriginalMapsButton);
         HBox mapGenerationButtonBox = new HBox(2, mapSizeSpinner, generateNewMapButton);
-        HBox mapFeatureControlBox = new HBox(2, addWallsToggleButton, addCheckpointsToggleButton, clearAllMapFeaturesButton);
+        GridPane mapFeatureControlGrid = new GridPane();
+        mapFeatureControlGrid.setVgap(2);
+        mapFeatureControlGrid.setHgap(2);
+        mapFeatureControlGrid.add(addWallsToggleButton, 0, 0);
+        mapFeatureControlGrid.add(addCheckpointsToggleButton, 1, 0);
+        mapFeatureControlGrid.add(clearAllMapFeaturesButton, 2, 0);
+        mapFeatureControlGrid.add(addStartPositionToggleButton, 0, 1);
+        mapFeatureControlGrid.add(addTargetPositionToggleButton, 1, 1);
 
 
         //Creating a Grid Pane
@@ -186,7 +204,7 @@ class FXView {
         gridPane.add(separator, 0, 2, 2, 1);
         gridPane.add(sizeText, 0, 3);
         gridPane.add(mapGenerationButtonBox, 1, 3);
-        gridPane.add(mapFeatureControlBox, 1, 4);
+        gridPane.add(mapFeatureControlGrid, 1, 4);
         gridPane.add(wallsCheckPointInstructionsText, 0, 5, 2, 1);
 
         return gridPane;
@@ -239,37 +257,30 @@ class FXView {
     }
 
     private GridPane simulationOptionsLayout() {
+
         Text algorithmText = new Text("Algorithm");
-
-        Text visualizeText = new Text("Visualize");
-
-        Text stepdelayText = new Text("Step delay (ms)");
-
         ObservableList<String> algorithmOptions =
                 FXCollections.observableArrayList(
-                        "Dijkstra",
-                        "A*",
-                        "D*Lite",
-                        "MPAA*"
+                        Algorithm.DIJKSTRA.toString(),
+                        Algorithm.A_STAR.toString(),
+                        Algorithm.D_STAR_LITE.toString(),
+                        Algorithm.MPAA.toString()
                 );
-        ComboBox<String> algorithmComboBox = new ComboBox<>(algorithmOptions);
-        algorithmComboBox.setValue("Dijkstra");
+        algorithmComboBox = new ComboBox<>(algorithmOptions);
+        algorithmComboBox.setValue(Algorithm.DIJKSTRA.toString());
 
         Text allowDiagonalText = new Text("Allow diagonal?");
-
         RadioButton allowDiagonalRadioButton = new RadioButton("Yes");
         allowDiagonalRadioButton.setUserData(true);
         allowDiagonalRadioButton.setSelected(true);
-        RadioButton disallowDigonalRadioButton = new RadioButton("No");
-        disallowDigonalRadioButton.setUserData(false);
+        RadioButton disallowDiagonalRadioButton = new RadioButton("No");
+        disallowDiagonalRadioButton.setUserData(false);
         allowDiagonalToggleGroup = new ToggleGroup();
         allowDiagonalRadioButton.setToggleGroup(allowDiagonalToggleGroup);
-        disallowDigonalRadioButton.setToggleGroup(allowDiagonalToggleGroup);
-
-        HBox toggleAllowDiagonalBox = new HBox(10, allowDiagonalRadioButton, disallowDigonalRadioButton);
+        disallowDiagonalRadioButton.setToggleGroup(allowDiagonalToggleGroup);
+        HBox toggleAllowDiagonalBox = new HBox(10, allowDiagonalRadioButton, disallowDiagonalRadioButton);
 
         Text heuristicText = new Text("Distance Heuristic");
-
         RadioButton euclideanRadioButton = new RadioButton("Euclidean");
         euclideanRadioButton.setUserData(0);
         euclideanRadioButton.setSelected(true);
@@ -278,13 +289,13 @@ class FXView {
         heuristicToggleGroup = new ToggleGroup();
         euclideanRadioButton.setToggleGroup(heuristicToggleGroup);
         manhattanRadioButton.setToggleGroup(heuristicToggleGroup);
-
         HBox toggleHeuristicBox = new HBox(10, euclideanRadioButton, manhattanRadioButton);
 
-
+        Text visualizeText = new Text("Visualize");
         visualizeCheckbox = new CheckBox();
 
-        Slider stepDelaySlider = new Slider(10, 50, 30);
+        Text stepDelayText = new Text("Step delay (ms)");
+        stepDelaySlider = new Slider(10, 50, 30);
         stepDelaySlider.setShowTickMarks(true);
         stepDelaySlider.setShowTickLabels(true);
         stepDelaySlider.setMajorTickUnit(10f);
@@ -295,7 +306,7 @@ class FXView {
         runButton = new Button("Run");
         runButton.getStyleClass().add("button-primary");
         runButton.prefWidth(75);
-        Button stepButton = new Button("Step");
+        stepButton = new Button("Step");
         stepButton.getStyleClass().addAll("button-primary", "btn-green");
         stepButton.prefWidth(75);
         HBox simulationControlButtonBox = new HBox(10, runButton, stepButton);
@@ -318,11 +329,11 @@ class FXView {
         gridPane.add(algorithmComboBox, 1, 0);
         gridPane.add(allowDiagonalText, 0, 1);
         gridPane.add(toggleAllowDiagonalBox, 1, 1);
-        gridPane.add(heuristicText, 0,2);
-        gridPane.add(toggleHeuristicBox, 1,2);
+        gridPane.add(heuristicText, 0, 2);
+        gridPane.add(toggleHeuristicBox, 1, 2);
         gridPane.add(visualizeText, 0, 3);
         gridPane.add(visualizeCheckbox, 1, 3);
-        gridPane.add(stepdelayText, 0, 4);
+        gridPane.add(stepDelayText, 0, 4);
         gridPane.add(stepDelaySlider, 1, 4);
         gridPane.add(simulationControlButtonBox, 1, 5);
         return gridPane;
@@ -383,6 +394,10 @@ class FXView {
         return clearAllEmotionButton;
     }
 
+    ComboBox<String> getAlgorithmComboBox() {
+        return algorithmComboBox;
+    }
+
     ToggleGroup getAllowDiagonalToggleGroup() {
         return allowDiagonalToggleGroup;
     }
@@ -391,11 +406,23 @@ class FXView {
         return heuristicToggleGroup;
     }
 
+    CheckBox getVisualizeCheckbox() {
+        return visualizeCheckbox;
+    }
+
+    Slider getStepDelaySlider() {
+        return stepDelaySlider;
+    }
+
     Button getRunButton() {
         return runButton;
     }
 
-    void appendOutputText(String text){
+    Button getStepButton() {
+        return stepButton;
+    }
+
+    void appendOutputText(String text) {
         textArea.appendText(text + "\n");
     }
 
@@ -406,12 +433,11 @@ class FXView {
         confidenceCheckbox.setSelected(selected);
     }
 
-    void setMap(SimulationMap map) {
+    void setMap(Map map) {
         this.map = map;
-
     }
 
-    void showSimulationMap() {
+    void showMap() {
         if (map != null) {
             centerPane.getChildren().clear();
             double paneWidth = centerPane.getWidth();
@@ -422,7 +448,7 @@ class FXView {
             for (int i = 0; i < map.getGrid().size(); i++) {
                 for (int j = 0; j < map.getGrid().get(i).size(); j++) {
                     Label label = new Label(i + " " + j);
-                    label.setPrefSize(height, width);
+                    label.setPrefSize(width, height);
                     Pane pane = new Pane();
                     int row = i;
                     int col = j;
@@ -433,8 +459,14 @@ class FXView {
                     if (map.getGrid().get(row).get(col).isCheckPoint()) {
                         pane.getStyleClass().add("checkpoint");
                     }
-                    pane.setMaxSize(height, width);
-                    pane.setPrefSize(height, width);
+                    if (map.getGrid().get(row).get(col).isStart()) {
+                        pane.getStyleClass().add("start");
+                    }
+                    if (map.getGrid().get(row).get(col).isTarget()) {
+                        pane.getStyleClass().add("target");
+                    }
+                    pane.setMaxSize(width, height);
+                    pane.setPrefSize(width, height);
                     pane.setOnDragDetected(e -> pane.startFullDrag());
                     EventHandler<MouseEvent> simulationMouseEventHandler = e -> handleSimulationMapMouseEvents(e, pane, row, col);
                     pane.setOnMouseDragEntered(simulationMouseEventHandler);
@@ -446,25 +478,83 @@ class FXView {
     }
 
     private void handleSimulationMapMouseEvents(MouseEvent e, Pane pane, int row, int col) {
-        if (addWallsToggleButton.isSelected() || addCheckpointsToggleButton.isSelected()) {
+        if (addWallsToggleButton.isSelected() || addCheckpointsToggleButton.isSelected() || addStartPositionToggleButton.isSelected() || addTargetPositionToggleButton.isSelected()) {
             MouseButton mouseButton = e.getButton();
             if (mouseButton == MouseButton.PRIMARY) {
+
+                // Add Walls
+
                 if (addWallsToggleButton.isSelected()) {
                     map.getGrid().get(row).get(col).setWall(true);
                     map.getGrid().get(row).get(col).setCheckPoint(false);
-                    pane.getStyleClass().removeAll("path");
+                    map.getGrid().get(row).get(col).setStart(false);
+                    map.getGrid().get(row).get(col).setTarget(false);
+                    pane.getStyleClass().removeAll("path", "start", "target", "checkpoint");
                     pane.getStyleClass().add("wall");
-                } else if (addCheckpointsToggleButton.isSelected()) {
-                    map.getGrid().get(row).get(col).setWall(false);
+                }
+
+                // Add Checkpoints
+
+                else if (addCheckpointsToggleButton.isSelected()) {
                     map.getGrid().get(row).get(col).setCheckPoint(true);
-                    pane.getStyleClass().removeAll("path");
+                    map.getGrid().get(row).get(col).setWall(false);
+                    map.getGrid().get(row).get(col).setStart(false);
+                    map.getGrid().get(row).get(col).setTarget(false);
+                    pane.getStyleClass().removeAll("path", "wall", "start", "target");
                     pane.getStyleClass().add("checkpoint");
                 }
-            } else {
+
+                // Add Start Position , delete any current Start position set
+
+                else if (addStartPositionToggleButton.isSelected()) {
+                    map.getGrid().forEach(cellArrayList -> cellArrayList.forEach(cell -> {
+                        if (cell.isStart()) {
+                            cell.setStart(false);
+                            Pane currentStart = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
+                            if (currentStart != null) {
+                                currentStart.getStyleClass().removeAll("start");
+                            }
+                        }
+                    }));
+                    map.getGrid().get(row).get(col).setStart(true);
+                    map.getGrid().get(row).get(col).setCheckPoint(false);
+                    map.getGrid().get(row).get(col).setWall(false);
+                    map.getGrid().get(row).get(col).setTarget(false);
+                    pane.getStyleClass().removeAll("path", "wall", "checkpoint", "target");
+                    pane.getStyleClass().add("start");
+                }
+
+                // Add Target position , delete any current Target position set
+
+                else if (addTargetPositionToggleButton.isSelected()) {
+                    map.getGrid().forEach(cellArrayList -> cellArrayList.forEach(cell -> {
+                        if (cell.isTarget()) {
+                            cell.setTarget(false);
+                            Pane currentStart = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
+                            if (currentStart != null) {
+                                currentStart.getStyleClass().removeAll("target");
+                            }
+                        }
+                    }));
+                    map.getGrid().get(row).get(col).setTarget(true);
+                    map.getGrid().get(row).get(col).setStart(false);
+                    map.getGrid().get(row).get(col).setCheckPoint(false);
+                    map.getGrid().get(row).get(col).setWall(false);
+                    pane.getStyleClass().removeAll("path", "wall", "checkpoint", "start");
+                    pane.getStyleClass().add("target");
+                }
+            }
+            // On right-click remove whatever is there
+
+            else {
                 map.getGrid().get(row).get(col).setWall(false);
                 pane.getStyleClass().removeAll("wall");
                 map.getGrid().get(row).get(col).setCheckPoint(false);
                 pane.getStyleClass().removeAll("checkpoint");
+                map.getGrid().get(row).get(col).setStart(false);
+                pane.getStyleClass().removeAll("start");
+                map.getGrid().get(row).get(col).setTarget(false);
+                pane.getStyleClass().removeAll("target");
             }
         }
     }
@@ -476,8 +566,9 @@ class FXView {
         });
 
         map.getPath().forEach(cell -> {
-            Pane pane =(Pane) getNodeFromGridPane(centerPane, cell.getCell_Index().i, cell.getCell_Index().j);
-            if (pane !=null) {
+            Pane pane = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
+            if (pane != null) {
+                pane.getStyleClass().removeAll("visited");
                 pane.getStyleClass().add("path");
             }
         });
@@ -493,7 +584,18 @@ class FXView {
     }
 
     void setPath(ArrayList<Cell> shortestPath) {
-    map.setPath(shortestPath);
+        map.setPath(shortestPath);
+    }
+
+    void updateMap() {
+        map.getGrid().forEach(cellArrayList -> cellArrayList.forEach(cell -> {
+            if (cell.isVisited()) {
+                Pane visited = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
+                if (visited != null) {
+                    visited.getStyleClass().add("visited");
+                }
+            }
+        }));
     }
 }
 

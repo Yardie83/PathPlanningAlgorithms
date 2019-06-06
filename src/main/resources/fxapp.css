@@ -90,6 +90,18 @@
     -fx-background-color: #76c4ff;
 }
 
+.start{
+    -fx-background-color: #2db755;
+}
+
+.target{
+    -fx-background-color: #ffe033;
+}
+
 .path{
     -fx-background-color: #db8088;
+}
+
+.visited{
+    -fx-background-color: rgba(249, 136, 245, 0.16);
 }

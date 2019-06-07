@@ -566,10 +566,23 @@ class FXView {
 
     void updateMap() {
         map.getGrid().forEach(cellArrayList -> cellArrayList.forEach(cell -> {
+            Pane currentPane = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
+            Label scoreLabel = new Label(String.valueOf(cell.getF_score()));
+
+            if (currentPane != null) {
+                currentPane.getChildren().add(scoreLabel);
+            }
+
             if (cell.isVisited()) {
                 Pane visited = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
                 if (visited != null) {
                     visited.getStyleClass().add("visited");
+                }
+            }
+            if (cell.isRobotPosition()){
+                Pane robot = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
+                if (robot != null) {
+                    robot.getStyleClass().add("robot");
                 }
             }
         }));

@@ -56,6 +56,7 @@ public class AStar extends Pathfinder {
             if (minCellOptional.isPresent()) {
                 Cell currentCell = minCellOptional.get();
                 currentCell.setVisited(true);
+                currentCell.setRobotPosition(true);
                 openlist.remove(currentCell);
                 closedList.add(currentCell);
 
@@ -92,7 +93,6 @@ public class AStar extends Pathfinder {
     public ArrayList<Cell> getShortestPath() {
         ArrayList<Cell> path = null;
         Cell target = map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(cell -> cell.isCheckPoint() || cell.isRobotPosition()).findFirst().orElse(null);
-
         if (target != null) {
             if (target.getCameFrom() != null) {
                 path = new ArrayList<>();
@@ -100,7 +100,7 @@ public class AStar extends Pathfinder {
             }
 
             while (target.getCameFrom() != null) {
-
+                target = map.getGrid().get(target.getCameFrom().i).get(target.getCameFrom().j);
                 path.add(0, target);
             }
         }

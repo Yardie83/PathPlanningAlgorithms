@@ -68,27 +68,27 @@ class Dijkstra extends Pathfinder {
 //    }
 
     public Cell step() {
-        if (!openList.isEmpty() && !targetFound) {
-            int robotPosition = getNextRobotPosition();
-            Pair openListCell = openList.get(robotPosition);
-            Cell cell = map.getGrid().get(openListCell.i).get(openListCell.j);
-            openList.remove(robotPosition);
-
-//            The robot position becomes the index of one the neighbours visited
-
-            cell.getNeighbours().forEach(neighbour -> {
-                Cell neighbourCell = map.getGrid().get(neighbour.i).get(neighbour.j);
-                if (!neighbourCell.isVisited()) {
-                    update_Distance(cell, neighbourCell);
-                    neighbourCell.setVisited(true);
-                    if (neighbourCell.isCheckPoint()) {
-                        targetFound = true;
-                    }
-                }
-            });
-        } else {
-            isRunning = false;
-        }
+//        if (!openList.isEmpty() && !targetFound) {
+//            int robotPosition = getNextRobotPosition();
+//            Pair openListCell = openList.get(robotPosition);
+//            Cell cell = map.getGrid().get(openListCell.i).get(openListCell.j);
+//            openList.remove(robotPosition);
+//
+////            The robot position becomes the index of one the neighbours visited
+//
+//            cell.getNeighbours().forEach(neighbour -> {
+//                Cell neighbourCell = map.getGrid().get(neighbour.i).get(neighbour.j);
+//                if (!neighbourCell.isVisited()) {
+//                    update_Distance(cell, neighbourCell);
+//                    neighbourCell.setVisited(true);
+//                    if (neighbourCell.isCheckPoint()) {
+//                        targetFound = true;
+//                    }
+//                }
+//            });
+//        } else {
+//            isRunning = false;
+//        }
         return new Cell(new Pair(0, 0));
     }
 
@@ -146,20 +146,20 @@ class Dijkstra extends Pathfinder {
 
         ArrayList<Cell> path = null;
 
-        Cell target = map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(cell -> cell.isCheckPoint() || cell.isRobotPosition()).findFirst().orElse(null);
-
-        if (target != null) {
-            Cell currentCell = target;
-            if (currentCell.getCameFrom() != null) {
-                path = new ArrayList<>();
-                path.add(target);
-            }
-
-            while (currentCell.getCameFrom() != null) {
-//                currentCell = currentCell.getCameFrom();
-                path.add(0, currentCell);
-            }
-        }
+//        Cell target = map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(cell -> cell.isCheckPoint() || cell.isRobotPosition()).findFirst().orElse(null);
+//
+//        if (target != null) {
+//            Cell currentCell = target;
+//            if (currentCell.getCameFrom() != null) {
+//                path = new ArrayList<>();
+//                path.add(target);
+//            }
+//
+//            while (currentCell.getCameFrom() != null) {
+//              currentCell = currentCell.getCameFrom();
+//                path.add(0, currentCell);
+//            }
+//        }
         return path;
     }
 

@@ -91,20 +91,23 @@ class FXController {
         while (pathfinder.isRunning) {
             pathfinder.step();
             view.updateMap();
-            drawShortestPath();
+
         }
         drawShortestPath();
     }
-
-    private void handleStepButtonAction(){
-        simulationSetup();
+    private boolean isSetup = false;
+    private void handleStepButtonAction() {
+        if (!isSetup){
+            simulationSetup();
+            isSetup = true;
+        }
         if (pathfinder.isRunning) {
             pathfinder.step();
             view.updateMap();
+        } else {
+            drawShortestPath();
         }
-        drawShortestPath();
     }
-
 
     private void simulationSetup() {
         //     Get all the user options (Emotion options, Simulation options)
@@ -148,13 +151,10 @@ class FXController {
     }
 
 
-
-    private void drawShortestPath( ) {
+    private void drawShortestPath() {
         ArrayList<Cell> shortestPath = pathfinder.getShortestPath();
         if (shortestPath != null) {
-            shortestPath.forEach(cell -> {
-                appendOutputText(cell.getIndex().i + " : " + cell.getIndex().j);
-            });
+            shortestPath.forEach(cell -> appendOutputText(cell.getIndex().i + " : " + cell.getIndex().j));
             view.setPath(shortestPath);
             view.drawPath();
         } else {

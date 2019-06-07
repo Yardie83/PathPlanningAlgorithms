@@ -8,6 +8,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 class FXController {
 
@@ -86,7 +87,27 @@ class FXController {
     }
 
     private void handleRunButtonAction() {
-//     Get all the user options (Emotion options, Simulation options)
+        simulationSetup();
+        while (pathfinder.isRunning) {
+            pathfinder.step();
+            view.updateMap();
+            drawShortestPath();
+        }
+        drawShortestPath();
+    }
+
+    private void handleStepButtonAction(){
+        simulationSetup();
+        if (pathfinder.isRunning) {
+            pathfinder.step();
+            view.updateMap();
+        }
+        drawShortestPath();
+    }
+
+
+    private void simulationSetup() {
+        //     Get all the user options (Emotion options, Simulation options)
 
 //        Emotion options
 
@@ -97,13 +118,6 @@ class FXController {
         boolean visualize = view.getVisualizeCheckbox().isSelected();
         double stepDelay = view.getStepDelaySlider().getValue();
 
-        //TODO: Make start and goal dynamic
-
-        int start_i = 0;
-        int start_j = 0;
-        int target_i = 0;
-        int target_j = 0;
-
         pathfinder = PathfinderFactory.getPathfinder(algorithm);
         if (pathfinder != null) {
             pathfinder.setAllowDiagonals(allowDiagonals);
@@ -111,44 +125,29 @@ class FXController {
             pathfinder.setHeuristic(heuristic);
             if (map == null) {
                 appendOutputText("Generate a map first");
-                return;
+//                return;
             } else {
                 pathfinder.setMap(map);
                 pathfinder.init();
             }
-            if (start_i < 0 || start_j < 0) {
-                appendOutputText("Add a start point");
-                return;
-            } else {
-                pathfinder.setStart(0, 0);
-            }
-            if (target_i < 0 || target_j < 0) {
-                appendOutputText("Add a target point");
-                return;
-            } else {
-                pathfinder.setTarget(map.getGrid().size() - 1, map.getGrid().size() - 1);
-            }
-            runSimulation();
+
+
+//
+//            if () {
+//                appendOutputText("Add a start point");
+//                return;
+//            }
+//            if (target_i < 0 || target_j < 0) {
+//                appendOutputText("Add a target point");
+//                return;
+//            }
+//            else {
+//                pathfinder.setTarget(map.getGrid().size() - 1, map.getGrid().size() - 1);
+//            }
         }
     }
 
-    private void handleStepButtonAction(){
-        handleRunButtonAction();
-        if (pathfinder.isRunning) {
-            pathfinder.step();
-            view.updateMap();
-            drawShortestPath();
-        }
-    }
 
-    private void runSimulation( ) {
-        while (pathfinder.isRunning) {
-            pathfinder.step();
-            view.updateMap();
-            drawShortestPath();
-        }
-//        drawShortestPath(pathfinder);
-    }
 
     private void drawShortestPath( ) {
         ArrayList<Cell> shortestPath = pathfinder.getShortestPath();

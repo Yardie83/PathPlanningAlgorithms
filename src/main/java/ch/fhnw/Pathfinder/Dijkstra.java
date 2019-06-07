@@ -1,7 +1,6 @@
 package ch.fhnw.Pathfinder;
 
 import ch.fhnw.Cell;
-import ch.fhnw.util.Moves;
 import ch.fhnw.util.Pair;
 
 import java.util.ArrayList;
@@ -16,57 +15,57 @@ class Dijkstra extends Pathfinder {
 
     public void init() {
 
-        openList = new ArrayList<>();
-        targetFound = false;
-
-        for (int i = 0; i < this.map.getGrid().size(); i++) {
-            for (int j = 0; j < map.getGrid().get(i).size(); j++) {
-                Cell cell = map.getGrid().get(i).get(j);
-                cell.setVisited(false);
-                cell.setDistance(Integer.MAX_VALUE);
-                cell.setCameFrom(null);
-                ArrayList<Pair> neighbours = populateNeighbours(cell);
-                cell.setNeighbours(neighbours);
-                if (cell.isStart()) {
-                    cell.setDistance(0);
-                }
-                openList.add(new Pair(cell.getIndex().i, cell.getIndex().j));
-            }
-        }
+//        openList = new ArrayList<>();
+//        targetFound = false;
+//
+//        for (int i = 0; i < this.map.getGrid().size(); i++) {
+//            for (int j = 0; j < map.getGrid().get(i).size(); j++) {
+//                Cell cell = map.getGrid().get(i).get(j);
+//                cell.setVisited(false);
+//                cell.setDistance(Integer.MAX_VALUE);
+//                cell.setCameFrom(null);
+//                ArrayList<Pair> neighbours = getNeighbours(cell);
+//                cell.setNeighbours(neighbours);
+//                if (cell.isStart()) {
+//                    cell.setDistance(0);
+//                }
+//                openList.add(new Pair(cell.getIndex().i, cell.getIndex().j));
+//            }
+//        }
     }
 
-    private ArrayList<Pair> populateNeighbours(Cell currentCell) {
-        ArrayList<Pair> neighbours = new ArrayList<>();
-
-        //Add Left/Up/Right/Down Moves
-        for (int i = 0; i < 4; i++) {
-            Cell neighbour = this.getNeighbourNode(currentCell.getIndex().i + Moves.LURDMoves.get(i).i, currentCell.getIndex().j + Moves.LURDMoves.get(i).j);
-            if (neighbour != null) {
-                if (!neighbour.isWall()) {
-                    neighbours.add(new Pair(neighbour.getIndex().i, neighbour.getIndex().j));
-                }
-            }
-        }
-        if (allowDiagonals) {
-            for (int i = 0; i < 4; i++) {
-                Cell neighbour = this.getNeighbourNode(currentCell.getIndex().i + Moves.diagonalMoves.get(i).i, currentCell.getIndex().j + Moves.diagonalMoves.get(i).j);
-                if (neighbour != null) {
-                    if (!neighbour.isWall()) {
-                        neighbours.add(new Pair(neighbour.getIndex().i, neighbour.getIndex().j));
-                    }
-                }
-            }
-        }
-        return neighbours;
-    }
-
-    private Cell getNeighbourNode(int i, int j) {
-        if (i < 0 || i >= map.getGrid().size() ||
-                j < 0 || j >= map.getGrid().size()) {
-            return null;
-        }
-        return map.getGrid().get(i).get(j);
-    }
+//    private ArrayList<Pair> getNeighbours(Cell currentCell) {
+//        ArrayList<Pair> neighbours = new ArrayList<>();
+//
+//        //Add Left/Up/Right/Down Moves
+//        for (int i = 0; i < 4; i++) {
+//            Cell neighbour = this.getNeighbourNode(currentCell.getIndex().i + Moves.LURDMoves.get(i).i, currentCell.getIndex().j + Moves.LURDMoves.get(i).j);
+//            if (neighbour != null) {
+//                if (!neighbour.isWall()) {
+//                    neighbours.add(new Pair(neighbour.getIndex().i, neighbour.getIndex().j));
+//                }
+//            }
+//        }
+//        if (allowDiagonals) {
+//            for (int i = 0; i < 4; i++) {
+//                Cell neighbour = this.getNeighbourNode(currentCell.getIndex().i + Moves.diagonalMoves.get(i).i, currentCell.getIndex().j + Moves.diagonalMoves.get(i).j);
+//                if (neighbour != null) {
+//                    if (!neighbour.isWall()) {
+//                        neighbours.add(new Pair(neighbour.getIndex().i, neighbour.getIndex().j));
+//                    }
+//                }
+//            }
+//        }
+//        return neighbours;
+//    }
+//
+//    private Cell getNeighbourNode(int i, int j) {
+//        if (i < 0 || i >= map.getGrid().size() ||
+//                j < 0 || j >= map.getGrid().size()) {
+//            return null;
+//        }
+//        return map.getGrid().get(i).get(j);
+//    }
 
     public Cell step() {
         if (!openList.isEmpty() && !targetFound) {
@@ -82,7 +81,7 @@ class Dijkstra extends Pathfinder {
                 if (!neighbourCell.isVisited()) {
                     update_Distance(cell, neighbourCell);
                     neighbourCell.setVisited(true);
-                    if (neighbourCell.isTarget()) {
+                    if (neighbourCell.isCheckPoint()) {
                         targetFound = true;
                     }
                 }
@@ -128,7 +127,7 @@ class Dijkstra extends Pathfinder {
         double alternative = currentCell.getDistance() + distance;
         if (alternative < neighbour.getDistance()) {
             neighbour.setDistance(alternative);
-            neighbour.setCameFrom(currentCell);
+//            neighbour.setCameFrom(currentCell);
         }
     }
 
@@ -147,7 +146,7 @@ class Dijkstra extends Pathfinder {
 
         ArrayList<Cell> path = null;
 
-        Cell target = map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(cell -> cell.isTarget() || cell.isRobotPosition()).findFirst().orElse(null);
+        Cell target = map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(cell -> cell.isCheckPoint() || cell.isRobotPosition()).findFirst().orElse(null);
 
         if (target != null) {
             Cell currentCell = target;
@@ -157,7 +156,7 @@ class Dijkstra extends Pathfinder {
             }
 
             while (currentCell.getCameFrom() != null) {
-                currentCell = currentCell.getCameFrom();
+//                currentCell = currentCell.getCameFrom();
                 path.add(0, currentCell);
             }
         }

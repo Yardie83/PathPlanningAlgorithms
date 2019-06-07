@@ -11,6 +11,9 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -462,9 +465,6 @@ class FXView {
                     if (map.getGrid().get(row).get(col).isStart()) {
                         pane.getStyleClass().add("start");
                     }
-                    if (map.getGrid().get(row).get(col).isTarget()) {
-                        pane.getStyleClass().add("target");
-                    }
                     pane.setMaxSize(width, height);
                     pane.setPrefSize(width, height);
                     pane.setOnDragDetected(e -> pane.startFullDrag());
@@ -488,8 +488,7 @@ class FXView {
                     map.getGrid().get(row).get(col).setWall(true);
                     map.getGrid().get(row).get(col).setCheckPoint(false);
                     map.getGrid().get(row).get(col).setStart(false);
-                    map.getGrid().get(row).get(col).setTarget(false);
-                    pane.getStyleClass().removeAll("path", "start", "target", "checkpoint");
+                    pane.getStyleClass().removeAll("path", "start", "checkpoint");
                     pane.getStyleClass().add("wall");
                 }
 
@@ -499,9 +498,10 @@ class FXView {
                     map.getGrid().get(row).get(col).setCheckPoint(true);
                     map.getGrid().get(row).get(col).setWall(false);
                     map.getGrid().get(row).get(col).setStart(false);
-                    map.getGrid().get(row).get(col).setTarget(false);
-                    pane.getStyleClass().removeAll("path", "wall", "start", "target");
+
+                    pane.getStyleClass().removeAll("path", "wall", "start");
                     pane.getStyleClass().add("checkpoint");
+                    map.getCheckPoints().add(map.getGrid().get(row).get(col));
                 }
 
                 // Add Start Position , delete any current Start position set
@@ -519,29 +519,8 @@ class FXView {
                     map.getGrid().get(row).get(col).setStart(true);
                     map.getGrid().get(row).get(col).setCheckPoint(false);
                     map.getGrid().get(row).get(col).setWall(false);
-                    map.getGrid().get(row).get(col).setTarget(false);
-                    pane.getStyleClass().removeAll("path", "wall", "checkpoint", "target");
+                    pane.getStyleClass().removeAll("path", "wall", "checkpoint");
                     pane.getStyleClass().add("start");
-                }
-
-                // Add Target position , delete any current Target position set
-
-                else if (addTargetPositionToggleButton.isSelected()) {
-                    map.getGrid().forEach(cellArrayList -> cellArrayList.forEach(cell -> {
-                        if (cell.isTarget()) {
-                            cell.setTarget(false);
-                            Pane currentStart = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
-                            if (currentStart != null) {
-                                currentStart.getStyleClass().removeAll("target");
-                            }
-                        }
-                    }));
-                    map.getGrid().get(row).get(col).setTarget(true);
-                    map.getGrid().get(row).get(col).setStart(false);
-                    map.getGrid().get(row).get(col).setCheckPoint(false);
-                    map.getGrid().get(row).get(col).setWall(false);
-                    pane.getStyleClass().removeAll("path", "wall", "checkpoint", "start");
-                    pane.getStyleClass().add("target");
                 }
             }
             // On right-click remove whatever is there
@@ -553,8 +532,6 @@ class FXView {
                 pane.getStyleClass().removeAll("checkpoint");
                 map.getGrid().get(row).get(col).setStart(false);
                 pane.getStyleClass().removeAll("start");
-                map.getGrid().get(row).get(col).setTarget(false);
-                pane.getStyleClass().removeAll("target");
             }
         }
     }

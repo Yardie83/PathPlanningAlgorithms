@@ -10,13 +10,19 @@ public class Cell {
     private boolean isCheckPoint = false;
     private double distance;
     private ArrayList<Pair> neighbours;
-    private Cell cameFrom;
+    private Pair cameFrom;
     private Pair index;
     private boolean isStart;
-    private boolean isTarget;
-    private boolean visited;
+    private boolean isVisited;
     private boolean robotPosition;
+    private double g_score;
+    private double h_score;
+    private double f_score;
 
+    public Cell(Pair index) {
+        this.index = index;
+        this.isVisited = false;
+    }
 
     public boolean isStart() {
         return isStart;
@@ -24,10 +30,6 @@ public class Cell {
 
     void setStart(boolean start) {
         isStart = start;
-    }
-
-    public Cell(Pair index) {
-        this.index = index;
     }
 
     public boolean isWall() {
@@ -38,11 +40,11 @@ public class Cell {
         isWall = wall;
     }
 
-    boolean isCheckPoint() {
+    public boolean isCheckPoint() {
         return isCheckPoint;
     }
 
-    void setCheckPoint(boolean checkPoint) {
+    public void setCheckPoint(boolean checkPoint) {
         isCheckPoint = checkPoint;
     }
 
@@ -62,11 +64,11 @@ public class Cell {
         return neighbours;
     }
 
-    public void setCameFrom(Cell cameFrom) {
+    public void setCameFrom(Pair cameFrom) {
         this.cameFrom = cameFrom;
     }
 
-    public Cell getCameFrom() {
+    public Pair getCameFrom() {
         return cameFrom;
     }
 
@@ -74,20 +76,12 @@ public class Cell {
         return index;
     }
 
-    public boolean isTarget() {
-        return isTarget;
-    }
-
-    void setTarget(boolean target) {
-        isTarget = target;
-    }
-
     public boolean isVisited() {
-        return visited;
+        return isVisited;
     }
 
-    public void setVisited(boolean visited) {
-        this.visited = visited;
+    public void setVisited(boolean visitied) {
+        this.isVisited = visitied;
     }
 
     public boolean isRobotPosition() {
@@ -96,5 +90,29 @@ public class Cell {
 
     public void setRobotPosition(boolean robotPosition) {
         this.robotPosition = robotPosition;
+    }
+
+    public double getG_score() {
+        return g_score;
+    }
+
+    public void setG_score(double g_score) {
+        this.g_score = g_score;
+    }
+
+    public double getH_score() {
+        return h_score;
+    }
+
+    public void setH_score(double h_score) {
+        this.h_score = h_score;
+    }
+
+    public double getF_score() {
+        return f_score;
+    }
+
+    public void setF_score(double f_score) {
+        this.f_score = f_score;
     }
 }

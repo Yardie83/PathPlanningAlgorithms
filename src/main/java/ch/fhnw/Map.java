@@ -8,9 +8,11 @@ public class Map {
 
     private ArrayList<ArrayList<Cell>> grid;
     private ArrayList<Cell> path;
+    private ArrayList<Cell> checkPoints;
 
     Map(int mapSize) {
         grid = new ArrayList<>();
+        checkPoints = new ArrayList<>();
         for (int i = 0; i < mapSize; i++) {
             grid.add(new ArrayList<>());
             for (int j = 0; j < mapSize; j++) {
@@ -94,5 +96,14 @@ public class Map {
 
     ArrayList<Cell> getPath() {
         return path;
+    }
+
+
+    public ArrayList<Cell> getCheckPoints() {
+        return checkPoints;
+    }
+
+    public void setCheckPoints(ArrayList<Cell> checkPoints) {
+        this.checkPoints = checkPoints;
     }
 }

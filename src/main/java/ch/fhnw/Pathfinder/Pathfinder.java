@@ -2,6 +2,8 @@ package ch.fhnw.Pathfinder;
 
 import ch.fhnw.Cell;
 import ch.fhnw.Map;
+import ch.fhnw.util.Moves;
+import ch.fhnw.util.Pair;
 
 import java.util.ArrayList;
 
@@ -23,6 +25,36 @@ public abstract class Pathfinder {
     public abstract void init();
 
     public abstract Cell step();
+
+    ArrayList<Cell> getNeighbours(Cell currentCell) {
+        ArrayList<Cell> neighbours = new ArrayList<>();
+
+        //Add Left/Up/Right/Down Moves
+        for (int i = 0; i < 4; i++) {
+            Cell neighbour = this.getNeighbourNode(currentCell.getIndex().i + Moves.LURDMoves.get(i).i, currentCell.getIndex().j + Moves.LURDMoves.get(i).j);
+            if (neighbour != null) {
+                neighbours.add(neighbour);
+            }
+        }
+        if (allowDiagonals) {
+            for (int i = 0; i < 4; i++) {
+                Cell neighbour = this.getNeighbourNode(currentCell.getIndex().i + Moves.diagonalMoves.get(i).i, currentCell.getIndex().j + Moves.diagonalMoves.get(i).j);
+                if (neighbour != null) {
+                    neighbours.add(neighbour);
+
+                }
+            }
+        }
+        return neighbours;
+    }
+
+    private Cell getNeighbourNode(int i, int j) {
+        if (i < 0 || i >= map.getGrid().size() ||
+                j < 0 || j >= map.getGrid().size()) {
+            return null;
+        }
+        return map.getGrid().get(i).get(j);
+    }
 
     public abstract ArrayList<Cell> getShortestPath();
 
@@ -51,4 +83,5 @@ public abstract class Pathfinder {
     public void setHeuristic(int heuristic) {
         this.heuristic = heuristic;
     }
+
 }

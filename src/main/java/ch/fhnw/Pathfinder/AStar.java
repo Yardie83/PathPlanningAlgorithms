@@ -73,13 +73,15 @@ public class AStar extends Pathfinder {
                 List<Cell> neighbours = neighboursCells.stream().filter(cell -> (!closedList.contains(cell))).collect(Collectors.toList());
 
                 neighbours.forEach(neighbourCell -> {
-                    double tempG_Score = currentCell.getG_score() + heuristic(currentCell, neighbourCell);
+                    double tempG_Score = currentCell.getG_score() + neighbourCell.getG_score();
                     if (tempG_Score < neighbourCell.getG_score()) {
                         neighbourCell.setG_score(tempG_Score);
-                        neighbourCell.setH_score((heuristic(currentCell, neighbourCell)));
-                        neighbourCell.setF_score(neighbourCell.getG_score() + neighbourCell.getH_score());
                         neighbourCell.setCameFrom(new Pair(currentCell.getIndex().i, currentCell.getIndex().j));
                     }
+
+                    neighbourCell.setH_score((heuristic(neighbourCell, map.getCheckPoints().get(0))));
+                    neighbourCell.setF_score(neighbourCell.getG_score() + neighbourCell.getH_score());
+
                     if (!openlist.contains(neighbourCell)) {
                         openlist.add(neighbourCell);
                     }

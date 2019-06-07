@@ -21,6 +21,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 class FXView {
 
@@ -56,6 +58,7 @@ class FXView {
     private final int WIDTH = 600;
     private boolean useNewMap;
     private Button stepButton;
+    private Label scoreLabel;
 
     FXView(Stage stage, FXModel fxModel) {
         this.stage = stage;
@@ -452,7 +455,7 @@ class FXView {
                 for (int j = 0; j < map.getGrid().get(i).size(); j++) {
                     Label label = new Label(i + " " + j);
                     label.setPrefSize(width, height);
-                    Pane pane = new Pane();
+                    Pane pane = new Pane(new Label());
                     int row = i;
                     int col = j;
                     pane.getStyleClass().add("cell-style");
@@ -567,19 +570,17 @@ class FXView {
     void updateMap() {
         map.getGrid().forEach(cellArrayList -> cellArrayList.forEach(cell -> {
             Pane currentPane = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
-            Label scoreLabel = new Label(String.valueOf(cell.getF_score()));
-
-            if (currentPane != null) {
-                currentPane.getChildren().add(scoreLabel);
+            if (currentPane != null && currentPane.getChildren().size() > 0) {
+                currentPane.getChildren().remove(0);
+                currentPane.getChildren().add(new Label(String.valueOf(Math.round(map.getGrid().get(cell.getIndex().i).get(cell.getIndex().j).getF_score()))));
             }
-
             if (cell.isVisited()) {
                 Pane visited = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
                 if (visited != null) {
                     visited.getStyleClass().add("visited");
                 }
             }
-            if (cell.isRobotPosition()){
+            if (cell.isRobotPosition()) {
                 Pane robot = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
                 if (robot != null) {
                     robot.getStyleClass().add("robot");

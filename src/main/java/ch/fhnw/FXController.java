@@ -86,27 +86,31 @@ class FXController {
         view.setAllEmotionCheckBox(false);
     }
 
+    private boolean isSetup = false;
+
     private void handleRunButtonAction() {
-        simulationSetup();
+        if (!isSetup) {
+            simulationSetup();
+        }
         while (pathfinder.isRunning) {
             pathfinder.step();
             view.updateMap();
-
         }
         drawShortestPath();
+        isSetup = false;
     }
-    private boolean isSetup = false;
+
     private void handleStepButtonAction() {
-        if (!isSetup){
+        if (!isSetup) {
             simulationSetup();
-            isSetup = true;
         }
         if (pathfinder.isRunning) {
             pathfinder.step();
             view.updateMap();
-        } else {
-            drawShortestPath();
+            return;
         }
+        drawShortestPath();
+        isSetup = false;
     }
 
     private void simulationSetup() {
@@ -148,6 +152,7 @@ class FXController {
 //                pathfinder.setTarget(map.getGrid().size() - 1, map.getGrid().size() - 1);
 //            }
         }
+        isSetup = true;
     }
 
 

@@ -1,7 +1,6 @@
 package ch.fhnw.Pathfinder;
 
 import ch.fhnw.Cell;
-import ch.fhnw.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,116 +20,68 @@ public class AStar extends Pathfinder {
 //    int heuristic;
 //    public boolean isRunning = true;
 
-    private ArrayList<Cell> openlist;
+    private ArrayList<Cell> openList;
     private ArrayList<Cell> closedList;
-    private boolean targetFound;
 
     @Override
     public void init() {
-        openlist = new ArrayList<>();
+        isRunning =true;
+        openList = new ArrayList<>();
         closedList = new ArrayList<>();
-        targetFound = false;
 
         map.getGrid().forEach(cells -> cells.forEach(cell -> {
             cell.setG_score(1);
+            cell.setF_score(heuristic(cell, map.getCheckPoints().get(0)));
             if (cell.isStart()) {
                 cell.setF_score(0);
             }
         }));
 
-        map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isStart).findFirst().ifPresent(startCell -> openlist.add(startCell));
+        map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isStart).findFirst().ifPresent(startCell -> openList.add(startCell));
 
     }
 
-    //    1. get lowest f-value cell
+//    1. get lowest f-value cell
 //    2. check if i am neighbour of this cell
 //    3. if not drive back until i am neighbour
 //    4. check if is wall
-//    5. if wall then add time and step and remove cell from openlist
+//    5. if wall then add time and step and remove cell from openList
 //    6 repeat
     @Override
-    public Cell step() {
-        if (!openlist.isEmpty() && !map.getCheckPoints().isEmpty()) {
+    public void step() {
 
-            Optional<Cell> minCellOptional = openlist.stream().min(Comparator.comparing(Cell::getF_score));
-            if (minCellOptional.isPresent()) {
-                Cell currentCell = minCellOptional.get();
-                currentCell.setVisited(true);
-                currentCell.setRobotPosition(true);
-                openlist.remove(currentCell);
-                closedList.add(currentCell);
-
-//                If we found a checkpoint
-                if (map.getCheckPoints().get(0).equals(currentCell)) {
-                    map.getCheckPoints().remove(0);
-                    if (map.getCheckPoints().isEmpty()) {
-                        isRunning = false;
-                    }
-                    return new Cell(new Pair(0, 0));
-                }
-
-                ArrayList<Cell> neighboursCells = getNeighbours(currentCell);
-                List<Cell> neighbours = neighboursCells.stream().filter(cell -> (!closedList.contains(cell))).collect(Collectors.toList());
-
-                neighbours.forEach(neighbourCell -> {
-                    double tempG_Score = currentCell.getG_score() + neighbourCell.getG_score();
-                    if (tempG_Score < neighbourCell.getG_score()) {
-                        neighbourCell.setG_score(tempG_Score);
-                        neighbourCell.setCameFrom(new Pair(currentCell.getIndex().i, currentCell.getIndex().j));
-                    }
-
-                    neighbourCell.setH_score((heuristic(neighbourCell, map.getCheckPoints().get(0))));
-                    neighbourCell.setF_score(neighbourCell.getG_score() + neighbourCell.getH_score());
-
-                    if (!openlist.contains(neighbourCell)) {
-                        openlist.add(neighbourCell);
-                    }
-                });
-            }
+        if (openList.isEmpty() || map.getCheckPoints().isEmpty()) {
+            isRunning = false;
+            return;
         }
-        return null;
-    }
 
-    @Override
-    public ArrayList<Cell> getShortestPath() {
-        ArrayList<Cell> path = null;
-        Cell target = map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(cell -> cell.isCheckPoint() || cell.isRobotPosition()).findFirst().orElse(null);
-        if (target != null) {
-            if (target.getCameFrom() != null) {
-                path = new ArrayList<>();
-                path.add(target);
+        Cell currentCell = getLowestDistanceCell();
+        currentCell.setVisited(true);
+        currentCell.setRobotPosition(true);
+        openList.remove(currentCell);
+        closedList.add(currentCell);
+        if (checkPointFound(currentCell)) return;
+
+        ArrayList<Cell> neighboursCells = getNeighbours(currentCell);
+        List<Cell> neighbours = neighboursCells.stream().filter(cell -> (!closedList.contains(cell))).collect(Collectors.toList());
+
+        neighbours.forEach(neighbourCell -> {
+
+//                    neighbourCell.setG_score(tempG_Score);
+//                        neighbourCell.setCameFrom(new Pair(currentCell.getIndex().i, currentCell.getIndex().j));
+//                    }
+//
+//                    neighbourCell.setH_score((heuristic(neighbourCell, map.getCheckPoints().get(0))));
+//                    neighbourCell.setF_score(neighbourCell.getG_score() + neighbourCell.getH_score());
+
+            if (!openList.contains(neighbourCell)) {
+                openList.add(neighbourCell);
             }
-
-            while (target.getCameFrom() != null) {
-                target = map.getGrid().get(target.getCameFrom().i).get(target.getCameFrom().j);
-                path.add(0, target);
-            }
-        }
-        return path;
+        });
     }
 
-
-    private double heuristic(Cell currentCell, Cell neighbour) {
-        double distance;
-        if (heuristic == 0) {
-            // Euclidean distance
-            distance = calculateEuclideanDistance(currentCell, neighbour);
-        } else {
-            //Manhattan distance
-            distance = calculateManhattanDistance(currentCell, neighbour);
-        }
-        return distance;
+    private Cell getLowestDistanceCell() {
+        Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getF_score));
+        return minDistanceCell.orElse(null);
     }
-
-    private double calculateEuclideanDistance(Cell a, Cell b) {
-        double ac = Math.abs(a.getIndex().i - b.getIndex().i);
-        double cb = Math.abs(b.getIndex().i - b.getIndex().j);
-        return Math.hypot(ac, cb);
-    }
-
-    private int calculateManhattanDistance(Cell a, Cell b) {
-        return Math.abs(a.getIndex().i - b.getIndex().i) + Math.abs(a.getIndex().j - b.getIndex().j);
-    }
-
-
 }

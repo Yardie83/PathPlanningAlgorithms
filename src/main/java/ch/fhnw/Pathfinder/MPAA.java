@@ -11,9 +11,7 @@ public class MPAA extends Pathfinder {
     }
 
     @Override
-    public Cell step() {
-
-        return null;
+    public void step() {
     }
 
     @Override

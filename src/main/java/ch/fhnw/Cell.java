@@ -9,6 +9,7 @@ public class Cell {
     private boolean isWall = false;
     private boolean isCheckPoint = false;
     private double distance;
+    private double cost;
     private ArrayList<Pair> neighbours;
     private Pair cameFrom;
     private Pair index;
@@ -44,7 +45,7 @@ public class Cell {
         return isCheckPoint;
     }
 
-    public void setCheckPoint(boolean checkPoint) {
+    void setCheckPoint(boolean checkPoint) {
         isCheckPoint = checkPoint;
     }
 
@@ -76,7 +77,7 @@ public class Cell {
         return index;
     }
 
-    public boolean isVisited() {
+    boolean isVisited() {
         return isVisited;
     }
 
@@ -114,5 +115,13 @@ public class Cell {
 
     public void setF_score(double f_score) {
         this.f_score = f_score;
+    }
+
+    public double getCost() {
+        return cost;
+    }
+
+    public void setCost(double cost) {
+        this.cost = cost;
     }
 }

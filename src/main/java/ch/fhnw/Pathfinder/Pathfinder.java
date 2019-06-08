@@ -2,29 +2,28 @@ package ch.fhnw.Pathfinder;
 
 import ch.fhnw.Cell;
 import ch.fhnw.Map;
+import ch.fhnw.util.Distance;
 import ch.fhnw.util.Moves;
 import ch.fhnw.util.Pair;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class Pathfinder {
 
-    boolean allowCrossingCorners;
     Map map;
-    int start_i;
-    int start_j;
-    int target_i;
-    int target_j;
-    boolean allowDiagonals;
-    int heuristic;
-    public boolean isRunning = true;
+    private int heuristic;
+    private boolean allowCrossingCorners;
+    private boolean allowDiagonals;
+    public boolean isRunning = false;
 
     Pathfinder() {
     }
 
     public abstract void init();
 
-    public abstract Cell step();
+    public abstract void step();
 
     ArrayList<Cell> getNeighbours(Cell currentCell) {
         ArrayList<Cell> neighbours = new ArrayList<>();
@@ -48,6 +47,17 @@ public abstract class Pathfinder {
         return neighbours;
     }
 
+
+    double heuristic(Cell startCell, Cell endCell) {
+        double distance;
+        if (heuristic == 0) {
+            distance = Distance.calculateEuclideanDistance(startCell, endCell);
+        } else {
+            distance = Distance.calculateManhattanDistance(startCell, endCell);
+        }
+        return distance;
+    }
+
     private Cell getNeighbourNode(int i, int j) {
         if (i < 0 || i >= map.getGrid().size() ||
                 j < 0 || j >= map.getGrid().size()) {
@@ -56,20 +66,37 @@ public abstract class Pathfinder {
         return map.getGrid().get(i).get(j);
     }
 
-    public abstract ArrayList<Cell> getShortestPath();
+    public ArrayList<Cell> getShortestPath() {
+        ArrayList<Cell> path = null;
+        Cell target = map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(cell -> cell.isCheckPoint() || cell.isRobotPosition()).findFirst().orElse(null);
+        if (target != null) {
+            if (target.getCameFrom() != null) {
+                path = new ArrayList<>();
+                path.add(target);
+            }
+
+            while (target.getCameFrom() != null) {
+                target = map.getGrid().get(target.getCameFrom().i).get(target.getCameFrom().j);
+                path.add(0, target);
+            }
+        }
+        return path;
+    }
+
+    boolean checkPointFound(Cell currentCell) {
+        //      If we found a checkpoint
+        if (map.getCheckPoints().get(0).equals(currentCell)) {
+            map.getCheckPoints().remove(0);
+            if (map.getCheckPoints().isEmpty()) {
+                isRunning = false;
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void setMap(Map map) {
         this.map = map;
-    }
-
-    public void setStart(int start_i, int start_j) {
-        this.start_i = start_i;
-        this.start_j = start_j;
-    }
-
-    public void setTarget(int target_i, int target_j) {
-        this.target_i = target_i;
-        this.target_j = target_j;
     }
 
     public void setAllowDiagonals(boolean allowDiagonals) {

@@ -11,9 +11,8 @@ public class DStarLite extends Pathfinder {
     }
 
     @Override
-    public Cell step() {
+    public void step() {
 
-        return null;
     }
 
     @Override

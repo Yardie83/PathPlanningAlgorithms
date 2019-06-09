@@ -17,11 +17,17 @@ public abstract class Pathfinder {
     private boolean allowCrossingCorners;
     private boolean allowDiagonals;
     public boolean isRunning = false;
+    ArrayList<Cell> openList;
+    ArrayList<Cell> closedList;
+    ArrayList<Cell> checkPoints;
 
-    Pathfinder() {
-    }
-
-    public abstract void init();
+    public void init(){
+        isRunning =true;
+        openList = new ArrayList<>();
+        closedList = new ArrayList<>();
+        checkPoints = new ArrayList<>();
+        checkPoints.addAll(map.getCheckPoints());
+    };
 
     public abstract void step();
 
@@ -85,9 +91,9 @@ public abstract class Pathfinder {
 
     boolean checkPointFound(Cell currentCell) {
         //      If we found a checkpoint
-        if (map.getCheckPoints().get(0).equals(currentCell)) {
-            map.getCheckPoints().remove(0);
-            if (map.getCheckPoints().isEmpty()) {
+        if (checkPoints.get(0).equals(currentCell)) {
+            checkPoints.remove(currentCell);
+            if (checkPoints.isEmpty()) {
                 isRunning = false;
                 return true;
             }
@@ -97,6 +103,10 @@ public abstract class Pathfinder {
 
     public void setMap(Map map) {
         this.map = map;
+    }
+
+    public Map getMap() {
+        return map;
     }
 
     public void setAllowDiagonals(boolean allowDiagonals) {

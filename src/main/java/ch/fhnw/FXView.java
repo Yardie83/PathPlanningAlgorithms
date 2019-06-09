@@ -18,6 +18,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -445,9 +446,12 @@ class FXView {
 
             for (int i = 0; i < map.getGrid().size(); i++) {
                 for (int j = 0; j < map.getGrid().get(i).size(); j++) {
-                    Label label = new Label(i + " " + j);
+                    Label label = new Label();
                     label.setPrefSize(width, height);
-                    Pane pane = new Pane(new Label());
+                    label.setAlignment(Pos.CENTER);
+                    Pane pane = new Pane(label);
+                    pane.setMaxSize(width, height);
+                    pane.setPrefSize(width, height);
                     int row = i;
                     int col = j;
                     pane.getStyleClass().add("cell-style");
@@ -460,13 +464,12 @@ class FXView {
                     if (map.getGrid().get(row).get(col).isStart()) {
                         pane.getStyleClass().add("start");
                     }
-                    pane.setMaxSize(width, height);
-                    pane.setPrefSize(width, height);
                     pane.setOnDragDetected(e -> pane.startFullDrag());
                     EventHandler<MouseEvent> simulationMouseEventHandler = e -> handleSimulationMapMouseEvents(e, pane, row, col);
                     pane.setOnMouseDragEntered(simulationMouseEventHandler);
                     pane.setOnMouseClicked(simulationMouseEventHandler);
                     centerPane.add(pane, i, j);
+                    centerPane.setAlignment(Pos.CENTER);
                 }
             }
         }

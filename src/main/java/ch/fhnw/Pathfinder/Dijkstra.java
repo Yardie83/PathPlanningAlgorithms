@@ -9,12 +9,8 @@ import java.util.stream.Collectors;
 
 class Dijkstra extends Pathfinder {
 
-    private ArrayList<Cell> openList;
-
     public void init() {
-        isRunning = true;
-        openList = new ArrayList<>();
-
+        super.init();
         /*
          *  1. Init each cell with default values
          *  2. Start cell heuristic = 0
@@ -29,10 +25,11 @@ class Dijkstra extends Pathfinder {
             if (cell.isWall()) cell.setCost(Integer.MAX_VALUE);
             openList.add(cell);
         }));
+        System.out.println("[Init]: Done");
     }
 
     public void step() {
-        if (openList.isEmpty() || map.getCheckPoints().isEmpty()) {
+        if (openList.isEmpty() || checkPoints.isEmpty()) {
             isRunning = false;
             return;
         }

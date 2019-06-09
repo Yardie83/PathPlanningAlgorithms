@@ -20,14 +20,9 @@ public class AStar extends Pathfinder {
 //    int heuristic;
 //    public boolean isRunning = true;
 
-    private ArrayList<Cell> openList;
-    private ArrayList<Cell> closedList;
-
     @Override
     public void init() {
-        isRunning =true;
-        openList = new ArrayList<>();
-        closedList = new ArrayList<>();
+        super.init();
 
         map.getGrid().forEach(cells -> cells.forEach(cell -> {
             cell.setG_score(1);
@@ -41,7 +36,7 @@ public class AStar extends Pathfinder {
 
     }
 
-//    1. get lowest f-value cell
+    //    1. get lowest f-value cell
 //    2. check if i am neighbour of this cell
 //    3. if not drive back until i am neighbour
 //    4. check if is wall
@@ -50,7 +45,7 @@ public class AStar extends Pathfinder {
     @Override
     public void step() {
 
-        if (openList.isEmpty() || map.getCheckPoints().isEmpty()) {
+        if (openList.isEmpty() || checkPoints.isEmpty()) {
             isRunning = false;
             return;
         }
@@ -71,7 +66,7 @@ public class AStar extends Pathfinder {
 //                        neighbourCell.setCameFrom(new Pair(currentCell.getIndex().i, currentCell.getIndex().j));
 //                    }
 //
-//                    neighbourCell.setH_score((heuristic(neighbourCell, map.getCheckPoints().get(0))));
+//                    neighbourCell.setH_score((heuristic(neighbourCell, checkPoints.get(0))));
 //                    neighbourCell.setF_score(neighbourCell.getG_score() + neighbourCell.getH_score());
 
             if (!openList.contains(neighbourCell)) {

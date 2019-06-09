@@ -485,7 +485,7 @@ class FXView {
                     selectedCell.setWall(true);
                     selectedCell.setCheckPoint(false);
                     selectedCell.setStart(false);
-                    pane.getStyleClass().removeAll("path", "start", "checkpoint");
+                    pane.getStyleClass().removeAll("path", "start", "checkpoint", "visited");
                     pane.getStyleClass().add("wall");
                 }
 
@@ -494,7 +494,7 @@ class FXView {
                     selectedCell.setCheckPoint(true);
                     selectedCell.setWall(false);
                     selectedCell.setStart(false);
-                    pane.getStyleClass().removeAll("path", "wall", "start");
+                    pane.getStyleClass().removeAll("path", "wall", "start", "visited");
                     pane.getStyleClass().add("checkpoint");
                     map.getCheckPoints().add(selectedCell);
                 }
@@ -513,7 +513,7 @@ class FXView {
                     selectedCell.setStart(true);
                     selectedCell.setCheckPoint(false);
                     selectedCell.setWall(false);
-                    pane.getStyleClass().removeAll("path", "wall", "checkpoint");
+                    pane.getStyleClass().removeAll("path", "wall", "checkpoint", "visited");
                     pane.getStyleClass().add("start");
                 }
             }
@@ -536,12 +536,16 @@ class FXView {
         });
 
         map.getPath().forEach(cell -> {
-            Pane pane = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
-            if (pane != null) {
-                pane.getStyleClass().removeAll("visited");
-                pane.getStyleClass().add("path");
+            if (cell.isVisited() && !cell.isWall() && !cell.isStart() && !cell.isCheckPoint()) {
+
+                Pane pane = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
+                if (pane != null) {
+                    pane.getStyleClass().removeAll("visited");
+                    pane.getStyleClass().add("path");
+                }
             }
         });
+
     }
 
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
@@ -560,16 +564,16 @@ class FXView {
     void updateMap() {
         map.getGrid().forEach(cells -> cells.forEach(cell -> {
             Pane currentPane = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
-            if (currentPane!=null) {
+            if (currentPane != null) {
                 if (currentPane.getChildren().size() > 0) {
                     Label label = (Label) currentPane.getChildren().get(0);
                     label.setText(String.valueOf(Math.round(map.getGrid().get(cell.getIndex().i).get(cell.getIndex().j).getF_score())));
                 }
-                if (cell.isVisited()) {
-                        currentPane.getStyleClass().add("visited");
+                if (cell.isVisited() && !cell.isWall() && !cell.isStart() && !cell.isCheckPoint()) {
+                    currentPane.getStyleClass().add("visited");
                 }
                 if (cell.isRobotPosition()) {
-                        currentPane.getStyleClass().add("robot");
+                    currentPane.getStyleClass().add("robot");
                 }
             }
         }));

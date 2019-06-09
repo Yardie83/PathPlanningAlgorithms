@@ -20,12 +20,12 @@ class Dijkstra extends Pathfinder {
             cell.setVisited(false);
             cell.setCameFrom(null);
             cell.setDistance(Integer.MAX_VALUE);
+            cell.setF_score(0);
             if (cell.isStart()) cell.setDistance(0);
             cell.setCost(1);
             if (cell.isWall()) cell.setCost(Integer.MAX_VALUE);
             openList.add(cell);
         }));
-        System.out.println("[Init]: Done");
     }
 
     public void step() {

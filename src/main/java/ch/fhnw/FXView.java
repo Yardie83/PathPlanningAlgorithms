@@ -21,6 +21,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -422,7 +424,11 @@ class FXView {
     }
 
     void appendOutputText(String text) {
-        textArea.appendText(text + "\n");
+        textArea.appendText(text) ;
+    }
+
+    void clearOutputText() {
+        textArea.setText("");
     }
 
     void setAllEmotionCheckBox(boolean selected) {
@@ -567,14 +573,36 @@ class FXView {
             if (currentPane != null) {
                 if (currentPane.getChildren().size() > 0) {
                     Label label = (Label) currentPane.getChildren().get(0);
-                    label.setText(String.valueOf(Math.round(map.getGrid().get(cell.getIndex().i).get(cell.getIndex().j).getF_score())));
+                    label.setText(String.valueOf(Math.round(map.getGrid().get(cell.getIndex().i).get(cell.getIndex().j).getF_score() * 100.0) / 100.0));
+                    if (cell.isWall()) {
+                        label.setText(String.valueOf('\u221e'));
+                        label.getStyleClass().add("white");
+                    }
+                    ;
                 }
                 if (cell.isVisited() && !cell.isWall() && !cell.isStart() && !cell.isCheckPoint()) {
                     currentPane.getStyleClass().add("visited");
                 }
+                currentPane.getStyleClass().removeAll("robot");
                 if (cell.isRobotPosition()) {
                     currentPane.getStyleClass().add("robot");
                 }
+            }
+        }));
+    }
+
+    void reset() {
+        map.getGrid().forEach(cells -> cells.forEach(cell -> {
+            Pane currentPane = (Pane) getNodeFromGridPane(centerPane, cell.getIndex().i, cell.getIndex().j);
+            if (currentPane != null) {
+                if (currentPane.getChildren().size() > 0) {
+                    Label label = (Label) currentPane.getChildren().get(0);
+                    label.setText("0");
+                }
+                if (!cell.isWall() && !cell.isStart()) {
+                    currentPane.getStyleClass().removeAll("visited", "robot", "path");
+                }
+                if (cell.isCheckPoint()) currentPane.getStyleClass().add("checkpoint");
             }
         }));
     }

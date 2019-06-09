@@ -29,6 +29,8 @@ public class AStar extends Pathfinder {
             cell.setF_score(heuristic(cell, map.getCheckPoints().get(0)));
             if (cell.isStart()) {
                 cell.setF_score(0);
+                cell.setRobotPosition(true);
+                robotCell = cell;
             }
         }));
 
@@ -44,16 +46,8 @@ public class AStar extends Pathfinder {
 //    6 repeat
     @Override
     public void step() {
+        super.step();
 
-        if (openList.isEmpty() || checkPoints.isEmpty()) {
-            isRunning = false;
-            return;
-        }
-
-        Cell currentCell = getLowestDistanceCell();
-        currentCell.setVisited(true);
-        currentCell.setRobotPosition(true);
-        openList.remove(currentCell);
         closedList.add(currentCell);
         if (checkPointFound(currentCell)) return;
 

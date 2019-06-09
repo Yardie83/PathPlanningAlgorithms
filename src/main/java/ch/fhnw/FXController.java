@@ -59,6 +59,7 @@ class FXController {
         map = model.createOriginalMap(mapIndex);
         setMap();
         showMap();
+        view.clearOutputText();
     }
 
     //    Generate a new map
@@ -68,6 +69,7 @@ class FXController {
         map = model.createNewMap(mapSize);
         setMap();
         showMap();
+        view.clearOutputText();
     }
 
     private void setMap() {
@@ -91,6 +93,7 @@ class FXController {
     private void handleRunButtonAction() {
         if (!isSetup) {
             simulationSetup();
+            view.reset();
         }
         while (pathfinder.isRunning) {
             pathfinder.step();
@@ -103,6 +106,7 @@ class FXController {
     private void handleStepButtonAction() {
         if (!isSetup) {
             simulationSetup();
+            view.reset();
         }
         if (pathfinder.isRunning) {
             pathfinder.step();
@@ -131,7 +135,7 @@ class FXController {
             pathfinder.setAllowCrossingCorners(true);
             pathfinder.setHeuristic(heuristic);
             if (map == null) {
-                appendOutputText("Generate a map first");
+                view.appendOutputText("Generate a map first" + "\n");
 //                return;
             } else {
                 pathfinder.setMap(map);
@@ -152,6 +156,7 @@ class FXController {
 //                pathfinder.setTarget(map.getGrid().size() - 1, map.getGrid().size() - 1);
 //            }
         }
+        view.clearOutputText();
         isSetup = true;
     }
 
@@ -159,17 +164,15 @@ class FXController {
     private void drawShortestPath() {
         ArrayList<Cell> shortestPath = pathfinder.getShortestPath();
         if (shortestPath != null) {
-            shortestPath.forEach(cell -> appendOutputText(cell.getIndex().i + " : " + cell.getIndex().j));
+            view.appendOutputText("[ShortestPath]" + "\n");
+            shortestPath.forEach(cell ->  view.appendOutputText(cell.getIndex().i + "," + cell.getIndex().j + "->"));
             view.setPath(shortestPath);
             view.drawPath();
         } else {
-            view.appendOutputText("No path found");
+            view.appendOutputText("No path found" + "\n");
         }
     }
 
-    private void appendOutputText(String text) {
-        view.appendOutputText(text);
-    }
 
     void show() {
         view.show();

@@ -7,7 +7,9 @@ import ch.fhnw.util.Moves;
 import ch.fhnw.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class Pathfinder {
@@ -20,6 +22,8 @@ public abstract class Pathfinder {
     ArrayList<Cell> openList;
     ArrayList<Cell> closedList;
     ArrayList<Cell> checkPoints;
+    Cell robotCell;
+    public Cell currentCell;
 
     public void init(){
         isRunning =true;
@@ -29,7 +33,23 @@ public abstract class Pathfinder {
         checkPoints.addAll(map.getCheckPoints());
     };
 
-    public abstract void step();
+    public void step(){
+        if (openList.isEmpty() || checkPoints.isEmpty()) {
+            isRunning = false;
+            return;
+        }
+        robotCell.setRobotPosition(false);
+        currentCell = getLowestDistanceCell();
+        currentCell.setRobotPosition(true);
+        robotCell = currentCell;
+        currentCell.setVisited(true);
+        openList.remove(currentCell);
+    };
+
+    private Cell getLowestDistanceCell() {
+        Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getDistance));
+        return minDistanceCell.orElse(null);
+    }
 
     ArrayList<Cell> getNeighbours(Cell currentCell) {
         ArrayList<Cell> neighbours = new ArrayList<>();
@@ -53,7 +73,6 @@ public abstract class Pathfinder {
         return neighbours;
     }
 
-
     double heuristic(Cell startCell, Cell endCell) {
         double distance;
         if (heuristic == 0) {
@@ -61,6 +80,7 @@ public abstract class Pathfinder {
         } else {
             distance = Distance.calculateManhattanDistance(startCell, endCell);
         }
+        if (endCell.isWall()) distance = Integer.MAX_VALUE;
         return distance;
     }
 
@@ -74,7 +94,7 @@ public abstract class Pathfinder {
 
     public ArrayList<Cell> getShortestPath() {
         ArrayList<Cell> path = null;
-        Cell target = map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(cell -> cell.isCheckPoint() || cell.isRobotPosition()).findFirst().orElse(null);
+        Cell target = map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isCheckPoint).findFirst().orElse(null);
         if (target != null) {
             if (target.getCameFrom() != null) {
                 path = new ArrayList<>();
@@ -93,7 +113,9 @@ public abstract class Pathfinder {
         //      If we found a checkpoint
         if (checkPoints.get(0).equals(currentCell)) {
             checkPoints.remove(currentCell);
+            System.out.println("[Checkpoint] : reached");
             if (checkPoints.isEmpty()) {
+                System.out.println("[Checkpoints]: No more checkpoints");
                 isRunning = false;
                 return true;
             }

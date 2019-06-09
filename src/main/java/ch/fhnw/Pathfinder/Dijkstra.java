@@ -6,7 +6,6 @@ import ch.fhnw.util.Pair;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 class Dijkstra extends Pathfinder {
 
     public void init() {
@@ -21,22 +20,21 @@ class Dijkstra extends Pathfinder {
             cell.setCameFrom(null);
             cell.setDistance(Integer.MAX_VALUE);
             cell.setF_score(0);
-            if (cell.isStart()) cell.setDistance(0);
             cell.setCost(1);
+            cell.setRobotPosition(false);
+            if (cell.isStart()) {
+                cell.setDistance(0);
+                cell.setRobotPosition(true);
+                robotCell = cell;
+            }
             if (cell.isWall()) cell.setCost(Integer.MAX_VALUE);
             openList.add(cell);
         }));
     }
 
     public void step() {
-        if (openList.isEmpty() || checkPoints.isEmpty()) {
-            isRunning = false;
-            return;
-        }
-        Cell currentCell = getLowestDistanceCell();
-        openList.remove(currentCell);
+        super.step();
         if (checkPointFound(currentCell)) return;
-
         ArrayList<Cell> neighbours = (ArrayList<Cell>) getNeighbours(currentCell).stream().filter(neighbour -> openList.contains(neighbour)).collect(Collectors.toList());
         neighbours.forEach(neighbourCell -> {
             updateDistance(currentCell, neighbourCell);
@@ -44,17 +42,20 @@ class Dijkstra extends Pathfinder {
         });
     }
 
-    private Cell getLowestDistanceCell() {
-        Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getDistance));
-        return minDistanceCell.orElse(null);
-    }
-
     private void updateDistance(Cell currentCell, Cell neighbour) {
-        double alternative = currentCell.getDistance() + neighbour.getCost();
+        double alternative = currentCell.getDistance() + heuristic(currentCell, neighbour);
         if (alternative < neighbour.getDistance()) {
             neighbour.setDistance(alternative);
-            neighbour.setF_score(alternative);
             neighbour.setCameFrom(new Pair(currentCell.getIndex().i, currentCell.getIndex().j));
+
+//         For visualization purposes we store the distance from start  to the current cell
+            map.getGrid().forEach(cells -> {
+                cells.forEach(cell -> {
+                    if (cell.getIndex().i == neighbour.getIndex().i && cell.getIndex().j == neighbour.getIndex().j) {
+                        cell.setF_score(alternative);
+                    }
+                });
+            });
         }
     }
 }

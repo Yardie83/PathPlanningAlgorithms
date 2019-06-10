@@ -139,6 +139,7 @@ class FXView {
         separator.setHalignment(HPos.LEFT);
         separator.setValignment(VPos.CENTER);
 
+
         Text sizeText = new Text("Map Size");
 
         ObservableList<Integer> mapSizes = FXCollections.observableArrayList(//
@@ -183,7 +184,7 @@ class FXView {
         mapFeatureControlGrid.setHgap(2);
         mapFeatureControlGrid.add(addWallsToggleButton, 0, 0);
         mapFeatureControlGrid.add(addCheckpointsToggleButton, 1, 0);
-        mapFeatureControlGrid.add(clearAllMapFeaturesButton, 2, 0);
+        mapFeatureControlGrid.add(clearAllMapFeaturesButton, 1, 1);
         mapFeatureControlGrid.add(addStartPositionToggleButton, 0, 1);
 
         //Creating a Grid Pane
@@ -530,6 +531,7 @@ class FXView {
                 selectedCell.setCheckPoint(false);
                 pane.getStyleClass().removeAll("checkpoint");
                 selectedCell.setStart(false);
+                map.getCheckPoints().remove(map.getCheckPoints().indexOf(selectedCell));
                 pane.getStyleClass().removeAll("start");
             }
         }

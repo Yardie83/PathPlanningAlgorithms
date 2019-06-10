@@ -31,7 +31,7 @@ public class Cell {
         return isStart;
     }
 
-    void setStart(boolean start) {
+    public void setStart(boolean start) {
         isStart = start;
     }
 

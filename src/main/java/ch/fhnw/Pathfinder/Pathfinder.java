@@ -31,12 +31,10 @@ public abstract class Pathfinder {
         closedList = new ArrayList<>();
         checkPoints = new ArrayList<>();
         checkPoints.addAll(map.getCheckPoints());
-    }
+    };
 
-    public void step(){
 
-    }
-
+    public abstract void step();
 
     ArrayList<Cell> getNeighbours(Cell currentCell) {
         ArrayList<Cell> neighbours = new ArrayList<>();
@@ -92,7 +90,7 @@ public abstract class Pathfinder {
                 path.add(target);
             }
 
-            while (target.getCameFrom() != null) {
+            while (target.getCameFrom() != null && !target.isStart()) {
                 target = map.getGrid().get((int)target.getCameFrom().i).get((int)target.getCameFrom().j);
                 path.add(0, target);
             }
@@ -105,14 +103,20 @@ public abstract class Pathfinder {
         if (checkPoints.get(0).equals(currentCell)) {
             checkPoints.remove(currentCell);
             System.out.println("[Checkpoint] : reached");
-            if (checkPoints.isEmpty()) {
-                System.out.println("[Checkpoints]: No more checkpoints");
-                isRunning = false;
-                return true;
-            }
+            return true;
         }
         return false;
     }
+
+    boolean lastCheckPointFound(){
+        if (checkPoints.isEmpty()) {
+            System.out.println("[Checkpoints]: No more checkpoints");
+            isRunning = false;
+            return true;
+        }
+        return false;
+    }
+
 
     public void setMap(Map map) {
         this.map = map;

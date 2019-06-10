@@ -30,13 +30,6 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
-            <version>LATEST</version>
-            <classifier>mac</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
             <version>11</version>
             <classifier>linux</classifier>
         </dependency>

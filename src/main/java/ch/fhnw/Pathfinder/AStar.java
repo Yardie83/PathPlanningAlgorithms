@@ -1,6 +1,7 @@
 package ch.fhnw.Pathfinder;
 
 import ch.fhnw.Cell;
+import ch.fhnw.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -25,6 +26,7 @@ public class AStar extends Pathfinder {
         super.init();
 
         map.getGrid().forEach(cells -> cells.forEach(cell -> {
+            cell.setVisited(false);
             cell.setG_score(1);
             if (cell.isStart()) {
                 cell.setF_score(0);
@@ -54,18 +56,45 @@ public class AStar extends Pathfinder {
         if (currentCell == null) return;
         currentCell.setRobotPosition(true);
         robotCell.setRobotPosition(false);
+        currentCell.setCameFrom(new Pair(robotCell.getIndex().i, robotCell.getIndex().j));
         robotCell = currentCell;
         currentCell.setVisited(true);
         openList.remove(currentCell);
         closedList.add(currentCell);
-        if (checkPointFound(currentCell)) return;
+
+        if (checkPointFound(currentCell)) {
+
+            map.getGrid().forEach(cells -> cells.forEach(cell -> {
+                if (cell.isStart()) {
+                    cell.setStart(false);
+                }
+            }));
+
+            currentCell.setStart(true);
+            map.getGrid().forEach(cells -> cells.forEach(cell -> {
+                cell.setG_score(1);
+                if (cell.isStart()) {
+                    cell.setF_score(0);
+                    cell.setRobotPosition(true);
+                    robotCell = cell;
+                }
+                if (cell.isWall()) cell.setF_score(Integer.MAX_VALUE);
+            }));
+
+            //map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isStart).findFirst().ifPresent(startCell -> openList.add(startCell));
+        }
+
+        if (lastCheckPointFound()) return;
+
 
         ArrayList<Cell> neighboursCells = getNeighbours(currentCell);
         List<Cell> neighbours = neighboursCells.stream().filter(cell -> (!closedList.contains(cell))).collect(Collectors.toList());
 
-        neighbours.forEach(neighbourCell -> {
+        neighbours.forEach(neighbourCell ->
 
-            neighbourCell.setF_score(heuristic(neighbourCell, map.getCheckPoints().get(0)));
+        {
+
+            neighbourCell.setF_score(heuristic(neighbourCell, checkPoints.get(0)));
 
             if (!openList.contains(neighbourCell) && !neighbourCell.isWall() && !neighbourCell.isVisited()) {
                 openList.add(neighbourCell);
@@ -76,7 +105,7 @@ public class AStar extends Pathfinder {
     private Cell getLowestDistanceCell() {
         Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getF_score));
         Cell cell = minDistanceCell.orElse(null);
-        if (cell != null && cell.isWall()){
+        if (cell != null && cell.isWall()) {
 //            TODO: Add penalty time and return null
             cell.setVisited(true);
             openList.remove(cell);

@@ -4,6 +4,7 @@ import ch.fhnw.Pathfinder.Pathfinder;
 import ch.fhnw.Pathfinder.PathfinderFactory;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Button;
 import javafx.scene.control.Toggle;
@@ -63,6 +64,7 @@ class FXController {
         setMap();
         showMap();
         view.clearOutputText();
+        view.getStepButton().setDisable(false);
     }
 
     //    Generate a new map
@@ -73,6 +75,7 @@ class FXController {
         setMap();
         showMap();
         view.clearOutputText();
+        view.getStepButton().setDisable(false);
     }
 
     private void setMap() {
@@ -94,10 +97,7 @@ class FXController {
     private boolean isSetup = false;
 
     private void handleRunButtonAction() {
-        if (!isSetup) {
-            simulationSetup();
-            view.reset();
-        }
+
         long stepDelay = (long) view.getStepDelaySlider().getValue();
         fiveSecondsWonder = new Timeline(new KeyFrame(Duration.millis(stepDelay), event -> {
             handleStep();
@@ -108,7 +108,11 @@ class FXController {
     }
 
     private void simulationStop() {
-        fiveSecondsWonder.stop();
+        try {
+            fiveSecondsWonder.stop();
+        }catch (NullPointerException ex){
+
+        }
     }
 
     private void handleStep() {
@@ -165,7 +169,7 @@ class FXController {
 //                pathfinder.setTarget(map.getGrid().size() - 1, map.getGrid().size() - 1);
 //            }
         }
-        view.clearOutputText();
+        view.appendOutputText("-------------------------------------------------------------------------------\n");
         isSetup = true;
     }
 
@@ -175,6 +179,7 @@ class FXController {
         if (shortestPath != null) {
             view.appendOutputText("[ShortestPath]" + "\n");
             shortestPath.forEach(cell -> view.appendOutputText(cell.getIndex().i + "," + cell.getIndex().j + "->"));
+            view.appendOutputText("\n[Number of steps] " + (shortestPath.size()-1));
             view.setPath(shortestPath);
             view.drawPath();
         } else {

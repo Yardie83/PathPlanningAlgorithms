@@ -578,7 +578,6 @@ class FXView {
                         label.setText(String.valueOf('\u221e'));
                         label.getStyleClass().add("white");
                     }
-                    ;
                 }
                 if (cell.isVisited() && !cell.isWall() && !cell.isStart() && !cell.isCheckPoint()) {
                     currentPane.getStyleClass().add("visited");

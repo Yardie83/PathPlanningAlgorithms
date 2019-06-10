@@ -2,13 +2,15 @@ package ch.fhnw;
 
 import ch.fhnw.Pathfinder.Pathfinder;
 import ch.fhnw.Pathfinder.PathfinderFactory;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Button;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
 class FXController {
 
@@ -16,6 +18,7 @@ class FXController {
     private final FXModel model;
     private Map map;
     private Pathfinder pathfinder;
+    private Timeline fiveSecondsWonder;
 
     FXController(FXModel model, FXView view) {
         this.view = view;
@@ -49,7 +52,7 @@ class FXController {
         Button runButton = view.getRunButton();
         runButton.setOnAction(e -> handleRunButtonAction());
         Button stepButton = view.getStepButton();
-        stepButton.setOnAction(e -> handleStepButtonAction());
+        stepButton.setOnAction(e -> handleStep());
 
     }
 
@@ -95,23 +98,20 @@ class FXController {
             simulationSetup();
             view.reset();
         }
-        long startTime = System.currentTimeMillis();
         long stepDelay = (long) view.getStepDelaySlider().getValue();
-        while (pathfinder.isRunning) {
-            long currentTime = System.currentTimeMillis();
-            long delta = currentTime-startTime;
-            System.out.println(delta);
-             if (delta > stepDelay) {
-                 pathfinder.step();
-                 view.updateMap();
-                 startTime = currentTime;
-             }
-        }
-        drawShortestPath();
-        isSetup = false;
+        fiveSecondsWonder = new Timeline(new KeyFrame(Duration.millis(stepDelay), event -> {
+            handleStep();
+        }));
+
+        fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
+        fiveSecondsWonder.play();
     }
 
-    private void handleStepButtonAction() {
+    private void simulationStop() {
+        fiveSecondsWonder.stop();
+    }
+
+    private void handleStep() {
         if (!isSetup) {
             simulationSetup();
             view.reset();
@@ -121,6 +121,7 @@ class FXController {
             view.updateMap();
             return;
         }
+        simulationStop();
         drawShortestPath();
         isSetup = false;
     }
@@ -173,7 +174,7 @@ class FXController {
         ArrayList<Cell> shortestPath = pathfinder.getShortestPath();
         if (shortestPath != null) {
             view.appendOutputText("[ShortestPath]" + "\n");
-            shortestPath.forEach(cell ->  view.appendOutputText(cell.getIndex().i + "," + cell.getIndex().j + "->"));
+            shortestPath.forEach(cell -> view.appendOutputText(cell.getIndex().i + "," + cell.getIndex().j + "->"));
             view.setPath(shortestPath);
             view.drawPath();
         } else {

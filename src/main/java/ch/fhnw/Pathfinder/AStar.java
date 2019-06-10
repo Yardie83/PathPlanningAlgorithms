@@ -26,7 +26,6 @@ public class AStar extends Pathfinder {
 
         map.getGrid().forEach(cells -> cells.forEach(cell -> {
             cell.setG_score(1);
-            cell.setF_score(heuristic(cell, map.getCheckPoints().get(0)));
             if (cell.isStart()) {
                 cell.setF_score(0);
                 cell.setRobotPosition(true);
@@ -66,14 +65,9 @@ public class AStar extends Pathfinder {
 
         neighbours.forEach(neighbourCell -> {
 
-//                    neighbourCell.setG_score(tempG_Score);
-//                        neighbourCell.setCameFrom(new Pair(currentCell.getIndex().i, currentCell.getIndex().j));
-//                    }
-//
-//                    neighbourCell.setH_score((heuristic(neighbourCell, checkPoints.get(0))));
-//                    neighbourCell.setF_score(neighbourCell.getG_score() + neighbourCell.getH_score());
+            neighbourCell.setF_score(heuristic(neighbourCell, map.getCheckPoints().get(0)));
 
-            if (!openList.contains(neighbourCell)) {
+            if (!openList.contains(neighbourCell) && !neighbourCell.isWall() && !neighbourCell.isVisited()) {
                 openList.add(neighbourCell);
             }
         });
@@ -84,6 +78,7 @@ public class AStar extends Pathfinder {
         Cell cell = minDistanceCell.orElse(null);
         if (cell != null && cell.isWall()){
 //            TODO: Add penalty time and return null
+            cell.setVisited(true);
             openList.remove(cell);
             return null;
         }

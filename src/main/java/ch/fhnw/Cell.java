@@ -77,7 +77,7 @@ public class Cell {
         return index;
     }
 
-    boolean isVisited() {
+    public boolean isVisited() {
         return isVisited;
     }
 

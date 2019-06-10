@@ -32,6 +32,7 @@ public class AStar extends Pathfinder {
                 cell.setRobotPosition(true);
                 robotCell = cell;
             }
+            if (cell.isWall()) cell.setF_score(Integer.MAX_VALUE);
         }));
 
         map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isStart).findFirst().ifPresent(startCell -> openList.add(startCell));
@@ -46,8 +47,17 @@ public class AStar extends Pathfinder {
 //    6 repeat
     @Override
     public void step() {
-        super.step();
-
+        if (openList.isEmpty() || checkPoints.isEmpty()) {
+            isRunning = false;
+            return;
+        }
+        currentCell = getLowestDistanceCell();
+        if (currentCell == null) return;
+        currentCell.setRobotPosition(true);
+        robotCell.setRobotPosition(false);
+        robotCell = currentCell;
+        currentCell.setVisited(true);
+        openList.remove(currentCell);
         closedList.add(currentCell);
         if (checkPointFound(currentCell)) return;
 
@@ -71,6 +81,12 @@ public class AStar extends Pathfinder {
 
     private Cell getLowestDistanceCell() {
         Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getF_score));
-        return minDistanceCell.orElse(null);
+        Cell cell = minDistanceCell.orElse(null);
+        if (cell != null && cell.isWall()){
+//            TODO: Add penalty time and return null
+            openList.remove(cell);
+            return null;
+        }
+        return cell;
     }
 }

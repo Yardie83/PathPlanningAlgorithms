@@ -34,22 +34,9 @@ public abstract class Pathfinder {
     };
 
     public void step(){
-        if (openList.isEmpty() || checkPoints.isEmpty()) {
-            isRunning = false;
-            return;
-        }
-        robotCell.setRobotPosition(false);
-        currentCell = getLowestDistanceCell();
-        currentCell.setRobotPosition(true);
-        robotCell = currentCell;
-        currentCell.setVisited(true);
-        openList.remove(currentCell);
-    };
 
-    private Cell getLowestDistanceCell() {
-        Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getDistance));
-        return minDistanceCell.orElse(null);
     }
+
 
     ArrayList<Cell> getNeighbours(Cell currentCell) {
         ArrayList<Cell> neighbours = new ArrayList<>();

@@ -33,13 +33,27 @@ class Dijkstra extends Pathfinder {
     }
 
     public void step() {
-        super.step();
+        if (openList.isEmpty() || checkPoints.isEmpty()) {
+            isRunning = false;
+            return;
+        }
+        robotCell.setRobotPosition(false);
+        currentCell = getLowestDistanceCell();
+        currentCell.setRobotPosition(true);
+        robotCell = currentCell;
+        currentCell.setVisited(true);
+        openList.remove(currentCell);
         if (checkPointFound(currentCell)) return;
         ArrayList<Cell> neighbours = (ArrayList<Cell>) getNeighbours(currentCell).stream().filter(neighbour -> openList.contains(neighbour)).collect(Collectors.toList());
         neighbours.forEach(neighbourCell -> {
             updateDistance(currentCell, neighbourCell);
             if (!neighbourCell.isWall()) neighbourCell.setVisited(true);
         });
+    }
+
+    private Cell getLowestDistanceCell() {
+        Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getDistance));
+        return minDistanceCell.orElse(null);
     }
 
     private void updateDistance(Cell currentCell, Cell neighbour) {

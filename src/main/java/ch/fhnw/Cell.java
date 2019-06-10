@@ -19,6 +19,8 @@ public class Cell {
     private double g_score;
     private double h_score;
     private double f_score;
+    private int search;
+    private double RHS;
 
     public Cell(Pair index) {
         this.index = index;
@@ -123,5 +125,21 @@ public class Cell {
 
     public void setCost(double cost) {
         this.cost = cost;
+    }
+
+    public int getSearch() {
+        return search;
+    }
+
+    public void setSearch(int search) {
+        this.search = search;
+    }
+
+    public void setRHS(double rhs) {
+        this.RHS = rhs;
+    }
+
+    public double getRHS() {
+        return RHS;
     }
 }

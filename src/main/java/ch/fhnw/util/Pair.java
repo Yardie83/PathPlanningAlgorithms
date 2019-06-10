@@ -1,12 +1,20 @@
 package ch.fhnw.util;
 
-public class Pair {
+public class Pair<F, S> {
 
-    public final int i;
-    public final int j;
+    public final F i;
+    public final S j;
 
-    public Pair(int i, int j) {
+    public Pair(F i, S j) {
         this.i = i;
         this.j = j;
     }
+
+    public boolean lessThan(Pair other) {
+        if ((double) this.i < (double) other.i) return true;
+        else if ((double) this.i > (double) other.i) return true;
+        return (double) this.j < (double) other.j;
+    }
+
+
 }

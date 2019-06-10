@@ -31,7 +31,7 @@ public abstract class Pathfinder {
         closedList = new ArrayList<>();
         checkPoints = new ArrayList<>();
         checkPoints.addAll(map.getCheckPoints());
-    };
+    }
 
     public void step(){
 
@@ -43,14 +43,18 @@ public abstract class Pathfinder {
 
         //Add Left/Up/Right/Down Moves
         for (int i = 0; i < 4; i++) {
-            Cell neighbour = this.getNeighbourNode(currentCell.getIndex().i + Moves.LURDMoves.get(i).i, currentCell.getIndex().j + Moves.LURDMoves.get(i).j);
+            int neighbour_i =  (int)currentCell.getIndex().i;
+            int neighbour_j =  (int)currentCell.getIndex().j;
+            Cell neighbour = this.getNeighbourNode(neighbour_i + (int)Moves.LURDMoves.get(i).i, neighbour_j + (int)Moves.LURDMoves.get(i).j);
             if (neighbour != null) {
                 neighbours.add(neighbour);
             }
         }
         if (allowDiagonals) {
             for (int i = 0; i < 4; i++) {
-                Cell neighbour = this.getNeighbourNode(currentCell.getIndex().i + Moves.diagonalMoves.get(i).i, currentCell.getIndex().j + Moves.diagonalMoves.get(i).j);
+                int neighbour_i =  (int)currentCell.getIndex().i;
+                int neighbour_j =  (int)currentCell.getIndex().j;
+                Cell neighbour = this.getNeighbourNode(neighbour_i + (int)Moves.diagonalMoves.get(i).i, neighbour_j + (int)Moves.diagonalMoves.get(i).j);
                 if (neighbour != null) {
                     neighbours.add(neighbour);
 
@@ -89,7 +93,7 @@ public abstract class Pathfinder {
             }
 
             while (target.getCameFrom() != null) {
-                target = map.getGrid().get(target.getCameFrom().i).get(target.getCameFrom().j);
+                target = map.getGrid().get((int)target.getCameFrom().i).get((int)target.getCameFrom().j);
                 path.add(0, target);
             }
         }

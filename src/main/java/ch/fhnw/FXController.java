@@ -95,9 +95,17 @@ class FXController {
             simulationSetup();
             view.reset();
         }
+        long startTime = System.currentTimeMillis();
+        long stepDelay = (long) view.getStepDelaySlider().getValue();
         while (pathfinder.isRunning) {
-            pathfinder.step();
-            view.updateMap();
+            long currentTime = System.currentTimeMillis();
+            long delta = currentTime-startTime;
+            System.out.println(delta);
+             if (delta > stepDelay) {
+                 pathfinder.step();
+                 view.updateMap();
+                 startTime = currentTime;
+             }
         }
         drawShortestPath();
         isSetup = false;

@@ -296,11 +296,11 @@ class FXView {
         visualizeCheckbox = new CheckBox();
 
         Text stepDelayText = new Text("Step delay (ms)");
-        stepDelaySlider = new Slider(10, 50, 30);
+        stepDelaySlider = new Slider(100, 500, 300);
         stepDelaySlider.setShowTickMarks(true);
         stepDelaySlider.setShowTickLabels(true);
-        stepDelaySlider.setMajorTickUnit(10f);
-        stepDelaySlider.setBlockIncrement(10f);
+        stepDelaySlider.setMajorTickUnit(100f);
+        stepDelaySlider.setBlockIncrement(100f);
         stepDelaySlider.setMinorTickCount(0);
         stepDelaySlider.setSnapToTicks(true);
 

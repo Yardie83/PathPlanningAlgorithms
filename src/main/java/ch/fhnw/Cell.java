@@ -4,12 +4,11 @@ import ch.fhnw.util.Pair;
 
 import java.util.ArrayList;
 
-public class Cell {
+public class Cell implements Comparable {
 
     private boolean isWall = false;
     private boolean isCheckPoint = false;
     private double distance;
-    private double cost;
     private ArrayList<Pair> neighbours;
     private Pair cameFrom;
     private Pair index;
@@ -21,10 +20,23 @@ public class Cell {
     private double f_score;
     private int search;
     private double RHS;
+    public Pair<Double, Double> keys = new Pair<>(0.0,0.0);
 
     public Cell(Pair index) {
         this.index = index;
         this.isVisited = false;
+    }
+
+    @Override
+    //CompareTo Method used in a priority queue
+    public int compareTo(Object that) {
+        //This is a modified version of the gt method
+        Cell other = (Cell) that;
+        if ( this.keys.i >  other.keys.i) return 1;
+        else if ( this.keys.i < other.keys.i - 0.00001) return -1;
+        if ( this.keys.j > other.keys.j) return 1;
+        else if ( this.keys.j <  other.keys.j) return -1;
+        return 0;
     }
 
     public boolean isStart() {
@@ -117,14 +129,6 @@ public class Cell {
 
     public void setF_score(double f_score) {
         this.f_score = f_score;
-    }
-
-    public double getCost() {
-        return cost;
-    }
-
-    public void setCost(double cost) {
-        this.cost = cost;
     }
 
     public int getSearch() {

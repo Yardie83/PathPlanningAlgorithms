@@ -2,8 +2,8 @@ package ch.fhnw.util;
 
 public class Pair<F, S> {
 
-    public final F i;
-    public final S j;
+    public F i;
+    public S j;
 
     public Pair(F i, S j) {
         this.i = i;
@@ -15,6 +15,4 @@ public class Pair<F, S> {
         else if ((double) this.i > (double) other.i) return true;
         return (double) this.j < (double) other.j;
     }
-
-
 }

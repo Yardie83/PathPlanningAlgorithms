@@ -23,7 +23,8 @@ public abstract class Pathfinder {
     ArrayList<Cell> closedList;
     ArrayList<Cell> checkPoints;
     Cell robotCell;
-    public Cell currentCell;
+    Cell currentCell;
+    ArrayList<Cell> path;
 
     public void init(){
         isRunning =true;
@@ -31,6 +32,7 @@ public abstract class Pathfinder {
         closedList = new ArrayList<>();
         checkPoints = new ArrayList<>();
         checkPoints.addAll(map.getCheckPoints());
+        path = new ArrayList<>();
     };
 
 
@@ -82,7 +84,7 @@ public abstract class Pathfinder {
     }
 
     public ArrayList<Cell> getShortestPath() {
-        ArrayList<Cell> path = null;
+        path = null;
         Cell target = map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isCheckPoint).findFirst().orElse(null);
         if (target != null) {
             if (target.getCameFrom() != null) {

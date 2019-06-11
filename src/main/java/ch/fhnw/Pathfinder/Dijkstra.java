@@ -20,14 +20,14 @@ class Dijkstra extends Pathfinder {
             cell.setCameFrom(null);
             cell.setDistance(Integer.MAX_VALUE);
             cell.setF_score(0);
-            cell.setCost(1);
+            cell.setG_score(1);
             cell.setRobotPosition(false);
             if (cell.isStart()) {
                 cell.setDistance(0);
                 cell.setRobotPosition(true);
                 robotCell = cell;
             }
-            if (cell.isWall()) cell.setCost(Integer.MAX_VALUE);
+            if (cell.isWall()) cell.setG_score(Integer.MAX_VALUE);
             openList.add(cell);
         }));
     }

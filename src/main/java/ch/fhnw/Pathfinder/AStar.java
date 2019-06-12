@@ -37,6 +37,7 @@ public class AStar extends Pathfinder {
                 cell.setF_score(0);
                 cell.setRobotPosition(true);
                 robotCell = cell;
+                currentCell = cell;
                 localPath.add(robotCell);
             }
             if (cell.isWall()) cell.setF_score(Integer.MAX_VALUE);
@@ -52,21 +53,50 @@ public class AStar extends Pathfinder {
 //    4. check if is wall
 //    5. if wall then add time and step and remove cell from openList
 //    6 repeat
+    private boolean isNeighbour = true;
+
     @Override
     public void step() {
         if (openList.isEmpty() || checkPoints.isEmpty()) {
             isRunning = false;
             return;
         }
-        currentCell = getLowestDistanceCell();
+
+        if (isNeighbour) currentCell = getLowestDistanceCell();
+
         if (currentCell == null) return;
         currentCell.setRobotPosition(true);
         robotCell.setRobotPosition(false);
+
+        ArrayList<Cell> currentCellNeighbours = getNeighbours(currentCell);
+
+        if (currentCell != robotCell) {
+            isNeighbour = false;
+            for (Cell currentCellNeighbour : currentCellNeighbours) {
+                if (currentCellNeighbour.getIndex().i == robotCell.getIndex().i && currentCellNeighbour.getIndex().j == robotCell.getIndex().j) {
+                    isNeighbour = true;
+                }
+            }
+
+            if (!isNeighbour) {
+                if (localPath.size() > 1 && !currentCell.isStart()) {
+                    for (int i = 0; i < localPath.size(); i++) {
+                        Cell localPathCell = localPath.get(i);
+                        if (localPathCell.getIndex().i == robotCell.getIndex().i && localPathCell.getIndex().j == robotCell.getIndex().j) {
+                            currentCell = localPath.get(localPath.indexOf(localPathCell) - 1);
+                            return;
+                        }
+                    }
+                }
+                return;
+            }
+            isNeighbour = true;
+        }
+
         currentCell.setCameFrom(new Pair<>(robotCell.getIndex().i, robotCell.getIndex().j));
         robotCell = currentCell;
 
-        if (!(localPath.get(localPath.size() - 1).getIndex().i == robotCell.getIndex().i && localPath.get(localPath.size() - 1).getIndex().j == robotCell.getIndex().j))
-        {
+        if (!(localPath.get(localPath.size() - 1).getIndex().i == robotCell.getIndex().i && localPath.get(localPath.size() - 1).getIndex().j == robotCell.getIndex().j)) {
             localPath.add((Cell) robotCell.clone());
         }
 
@@ -99,11 +129,8 @@ public class AStar extends Pathfinder {
         List<Cell> neighbours = neighboursCells.stream().filter(cell -> (!closedList.contains(cell))).collect(Collectors.toList());
 
         neighbours.forEach(neighbourCell ->
-
         {
-
             neighbourCell.setF_score(heuristic(neighbourCell, checkPoints.get(0)));
-
             if (!openList.contains(neighbourCell) && !neighbourCell.isWall() && !neighbourCell.isVisited()) {
                 openList.add(neighbourCell);
             }

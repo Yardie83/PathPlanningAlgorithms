@@ -26,14 +26,17 @@ public abstract class Pathfinder {
     Cell currentCell;
     ArrayList<Cell> path;
 
-    public void init(){
-        isRunning =true;
+    public void init() {
+        isRunning = true;
         openList = new ArrayList<>();
         closedList = new ArrayList<>();
         checkPoints = new ArrayList<>();
         checkPoints.addAll(map.getCheckPoints());
         path = new ArrayList<>();
-    };
+        robotCell = currentCell;
+    }
+
+    ;
 
 
     public abstract void step();
@@ -43,18 +46,18 @@ public abstract class Pathfinder {
 
         //Add Left/Up/Right/Down Moves
         for (int i = 0; i < 4; i++) {
-            int neighbour_i =  (int)currentCell.getIndex().i;
-            int neighbour_j =  (int)currentCell.getIndex().j;
-            Cell neighbour = this.getNeighbourNode(neighbour_i + (int)Moves.LURDMoves.get(i).i, neighbour_j + (int)Moves.LURDMoves.get(i).j);
+            int neighbour_i = (int) currentCell.getIndex().i;
+            int neighbour_j = (int) currentCell.getIndex().j;
+            Cell neighbour = this.getNeighbourNode(neighbour_i + (int) Moves.LURDMoves.get(i).i, neighbour_j + (int) Moves.LURDMoves.get(i).j);
             if (neighbour != null) {
                 neighbours.add(neighbour);
             }
         }
         if (allowDiagonals) {
             for (int i = 0; i < 4; i++) {
-                int neighbour_i =  (int)currentCell.getIndex().i;
-                int neighbour_j =  (int)currentCell.getIndex().j;
-                Cell neighbour = this.getNeighbourNode(neighbour_i + (int)Moves.diagonalMoves.get(i).i, neighbour_j + (int)Moves.diagonalMoves.get(i).j);
+                int neighbour_i = (int) currentCell.getIndex().i;
+                int neighbour_j = (int) currentCell.getIndex().j;
+                Cell neighbour = this.getNeighbourNode(neighbour_i + (int) Moves.diagonalMoves.get(i).i, neighbour_j + (int) Moves.diagonalMoves.get(i).j);
                 if (neighbour != null) {
                     neighbours.add(neighbour);
 
@@ -93,7 +96,7 @@ public abstract class Pathfinder {
             }
 
             while (target.getCameFrom() != null && !target.isStart()) {
-                target = map.getGrid().get((int)target.getCameFrom().i).get((int)target.getCameFrom().j);
+                target = map.getGrid().get((int) target.getCameFrom().i).get((int) target.getCameFrom().j);
                 path.add(0, target);
             }
         }
@@ -110,7 +113,7 @@ public abstract class Pathfinder {
         return false;
     }
 
-    boolean lastCheckPointFound(){
+    boolean lastCheckPointFound() {
         if (checkPoints.isEmpty()) {
             System.out.println("[Checkpoints]: No more checkpoints");
             isRunning = false;

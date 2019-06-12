@@ -140,4 +140,5 @@ public abstract class Pathfinder {
         this.heuristic = heuristic;
     }
 
+    public abstract ArrayList<Cell> getLocalPath();
 }

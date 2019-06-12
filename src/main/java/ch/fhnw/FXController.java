@@ -134,8 +134,8 @@ class FXController {
             view.updateMap();
             return;
         }
-        simulationStop();
         drawShortestPath();
+        simulationStop();
         isSetup = false;
     }
 
@@ -180,7 +180,8 @@ class FXController {
 
 
     private void drawShortestPath() {
-        ArrayList<Cell> shortestPath = pathfinder.getShortestPath();
+
+        ArrayList<Cell> shortestPath = pathfinder.getLocalPath();
         if (shortestPath != null) {
             view.appendOutputText("[ShortestPath]" + "\n");
             shortestPath.forEach(cell -> view.appendOutputText(cell.getIndex().i + "," + cell.getIndex().j + "->"));

@@ -21,9 +21,14 @@ public class AStar extends Pathfinder {
 //    int heuristic;
 //    public boolean isRunning = true;
 
+
+    ArrayList<Cell> localPath;
+
     @Override
     public void init() {
         super.init();
+
+        localPath = new ArrayList<>();
 
         map.getGrid().forEach(cells -> cells.forEach(cell -> {
             cell.setVisited(false);
@@ -32,6 +37,7 @@ public class AStar extends Pathfinder {
                 cell.setF_score(0);
                 cell.setRobotPosition(true);
                 robotCell = cell;
+                localPath.add(robotCell);
             }
             if (cell.isWall()) cell.setF_score(Integer.MAX_VALUE);
         }));
@@ -58,6 +64,12 @@ public class AStar extends Pathfinder {
         robotCell.setRobotPosition(false);
         currentCell.setCameFrom(new Pair<>(robotCell.getIndex().i, robotCell.getIndex().j));
         robotCell = currentCell;
+
+        if (!(localPath.get(localPath.size() - 1).getIndex().i == robotCell.getIndex().i && localPath.get(localPath.size() - 1).getIndex().j == robotCell.getIndex().j))
+        {
+            localPath.add((Cell) robotCell.clone());
+        }
+
         currentCell.setVisited(true);
         openList.remove(currentCell);
         closedList.add(currentCell);
@@ -108,5 +120,9 @@ public class AStar extends Pathfinder {
             return null;
         }
         return cell;
+    }
+
+    public ArrayList<Cell> getLocalPath() {
+        return localPath;
     }
 }

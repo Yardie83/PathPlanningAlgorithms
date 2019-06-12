@@ -51,6 +51,11 @@ class Dijkstra extends Pathfinder {
         });
     }
 
+    @Override
+    public ArrayList<Cell> getLocalPath() {
+        return null;
+    }
+
     private Cell getLowestDistanceCell() {
         Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getDistance));
         return minDistanceCell.orElse(null);

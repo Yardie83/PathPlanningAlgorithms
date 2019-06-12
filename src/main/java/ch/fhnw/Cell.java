@@ -1,10 +1,11 @@
 package ch.fhnw;
 
 import ch.fhnw.util.Pair;
+import javafx.beans.binding.ObjectExpression;
 
 import java.util.ArrayList;
 
-public class Cell implements Comparable {
+public class Cell implements Comparable, Cloneable {
 
     private boolean isWall = false;
     private boolean isCheckPoint = false;
@@ -20,7 +21,7 @@ public class Cell implements Comparable {
     private double f_score;
     private int search;
     private double RHS;
-    public Pair<Double, Double> keys = new Pair<>(0.0,0.0);
+    public Pair<Double, Double> keys = new Pair<>(0.0, 0.0);
 
     public Cell(Pair index) {
         this.index = index;
@@ -32,11 +33,20 @@ public class Cell implements Comparable {
     public int compareTo(Object that) {
         //This is a modified version of the gt method
         Cell other = (Cell) that;
-        if ( this.keys.i >  other.keys.i) return 1;
-        else if ( this.keys.i < other.keys.i - 0.00001) return -1;
-        if ( this.keys.j > other.keys.j) return 1;
-        else if ( this.keys.j <  other.keys.j) return -1;
+        if (this.keys.i > other.keys.i) return 1;
+        else if (this.keys.i < other.keys.i - 0.00001) return -1;
+        if (this.keys.j > other.keys.j) return 1;
+        else if (this.keys.j < other.keys.j) return -1;
         return 0;
+    }
+
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public boolean isStart() {

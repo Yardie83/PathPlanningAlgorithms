@@ -12,6 +12,8 @@ import javafx.scene.control.ToggleGroup;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 class FXController {
 
@@ -98,19 +100,23 @@ class FXController {
 
     private void handleRunButtonAction() {
 
-        long stepDelay = (long) view.getStepDelaySlider().getValue();
-        fiveSecondsWonder = new Timeline(new KeyFrame(Duration.millis(stepDelay), event -> {
-            handleStep();
-        }));
+        Platform.runLater(() -> {
 
-        fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
-        fiveSecondsWonder.play();
+            long stepDelay = (long) view.getStepDelaySlider().getValue();
+            fiveSecondsWonder = new Timeline(new KeyFrame(Duration.millis(stepDelay), event -> {
+                handleStep();
+            }));
+
+            fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
+            fiveSecondsWonder.play();
+
+        });
     }
 
     private void simulationStop() {
         try {
             fiveSecondsWonder.stop();
-        }catch (NullPointerException ex){
+        } catch (NullPointerException ex) {
 
         }
     }
@@ -155,19 +161,14 @@ class FXController {
                 pathfinder.init();
             }
 
-
-//
-//            if () {
-//                appendOutputText("Add a start point");
-//                return;
-//            }
-//            if (target_i < 0 || target_j < 0) {
-//                appendOutputText("Add a target point");
-//                return;
-//            }
-//            else {
-//                pathfinder.setTarget(map.getGrid().size() - 1, map.getGrid().size() - 1);
-//            }
+            if (map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isStart).findAny().isEmpty()) {
+                view.appendOutputText("Add a start point");
+                return;
+            }
+            if (map.getCheckPoints().isEmpty()) {
+                view.appendOutputText("Add a checkpoint");
+                return;
+            }
         }
         view.appendOutputText("-------------------------------------------------------------------------------\n");
         isSetup = true;
@@ -179,7 +180,7 @@ class FXController {
         if (shortestPath != null) {
             view.appendOutputText("[ShortestPath]" + "\n");
             shortestPath.forEach(cell -> view.appendOutputText(cell.getIndex().i + "," + cell.getIndex().j + "->"));
-            view.appendOutputText("\n[Number of steps] " + (shortestPath.size()-1));
+            view.appendOutputText("\n[Number of steps] " + (shortestPath.size() - 1));
             view.setPath(shortestPath);
             view.drawPath();
         } else {

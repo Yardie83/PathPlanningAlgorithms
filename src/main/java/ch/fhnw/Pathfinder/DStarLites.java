@@ -138,11 +138,6 @@ public class DStarLites extends Pathfinder {
     }
 
     @Override
-    public ArrayList<Cell> getShortestPath() {
-        return path;
-    }
-
-    @Override
     public ArrayList<Cell> getLocalPath() {
         return null;
     }

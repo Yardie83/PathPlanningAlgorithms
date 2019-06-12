@@ -86,23 +86,6 @@ public abstract class Pathfinder {
         return map.getGrid().get(i).get(j);
     }
 
-    public ArrayList<Cell> getShortestPath() {
-        path = null;
-        Cell target = map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isCheckPoint).findFirst().orElse(null);
-        if (target != null) {
-            if (target.getCameFrom() != null) {
-                path = new ArrayList<>();
-                path.add(target);
-            }
-
-            while (target.getCameFrom() != null && !target.isStart()) {
-                target = map.getGrid().get((int) target.getCameFrom().i).get((int) target.getCameFrom().j);
-                path.add(0, target);
-            }
-        }
-        return path;
-    }
-
     boolean checkPointFound(Cell currentCell) {
         //      If we found a checkpoint
         if (checkPoints.get(0).equals(currentCell)) {

@@ -117,7 +117,6 @@ class FXController {
         try {
             fiveSecondsWonder.stop();
         } catch (NullPointerException ex) {
-
         }
     }
 
@@ -180,7 +179,7 @@ class FXController {
 
 
     private void drawShortestPath() {
-
+        view.updateMap();
         ArrayList<Cell> shortestPath = pathfinder.getLocalPath();
         if (shortestPath != null) {
             view.appendOutputText("[ShortestPath]" + "\n");

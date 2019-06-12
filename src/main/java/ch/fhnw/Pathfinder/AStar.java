@@ -63,8 +63,8 @@ public class AStar extends Pathfinder {
         }
 
         if (isNeighbour) currentCell = getLowestDistanceCell();
-
         if (currentCell == null) return;
+
         currentCell.setRobotPosition(true);
         robotCell.setRobotPosition(false);
 
@@ -83,7 +83,10 @@ public class AStar extends Pathfinder {
                     for (int i = 0; i < localPath.size(); i++) {
                         Cell localPathCell = localPath.get(i);
                         if (localPathCell.getIndex().i == robotCell.getIndex().i && localPathCell.getIndex().j == robotCell.getIndex().j) {
+                            currentCell.setRobotPosition(false);
                             currentCell = localPath.get(localPath.indexOf(localPathCell) - 1);
+                            System.out.println("[Changed CurrentCell]" + currentCell.getIndex().i + ":" + currentCell.getIndex().j + ", [F-Score]" + currentCell.getF_score());
+                            currentCell.setRobotPosition(true);
                             return;
                         }
                     }
@@ -92,9 +95,11 @@ public class AStar extends Pathfinder {
             }
             isNeighbour = true;
         }
-
+        System.out.println("[UnChanged CurrentCell]" + currentCell.getIndex().i + ":" + currentCell.getIndex().j + ", [F-Score]" + currentCell.getF_score());
         currentCell.setCameFrom(new Pair<>(robotCell.getIndex().i, robotCell.getIndex().j));
+        currentCell.setRobotPosition(false);
         robotCell = currentCell;
+        robotCell.setRobotPosition(true);
 
         if (!(localPath.get(localPath.size() - 1).getIndex().i == robotCell.getIndex().i && localPath.get(localPath.size() - 1).getIndex().j == robotCell.getIndex().j)) {
             localPath.add((Cell) robotCell.clone());

@@ -18,14 +18,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 class FXView {
 
@@ -544,14 +539,11 @@ class FXView {
         });
 
         map.getPath().forEach(cell -> {
-            if (cell.isVisited() && !cell.isWall() && !cell.isStart() && !cell.isCheckPoint()) {
-
                 Pane pane = (Pane) getNodeFromGridPane(centerPane, (int) cell.getIndex().i, (int) cell.getIndex().j);
                 if (pane != null) {
                     pane.getStyleClass().removeAll("visited");
                     pane.getStyleClass().add("path");
                 }
-            }
         });
 
     }
@@ -569,27 +561,34 @@ class FXView {
         map.setPath(shortestPath);
     }
 
+    private int iteration = 0;
+
     void updateMap() {
-        map.getGrid().forEach(cells -> cells.forEach(cell -> {
-            Pane currentPane = (Pane) getNodeFromGridPane(centerPane, (int) cell.getIndex().i, (int) cell.getIndex().j);
-            if (currentPane != null) {
-                if (currentPane.getChildren().size() > 0) {
-                    Label label = (Label) currentPane.getChildren().get(0);
-                    label.setText(String.valueOf(Math.round(map.getGrid().get((int) cell.getIndex().i).get((int) cell.getIndex().j).getF_score() * 100.0) / 100.0));
-                    if (cell.isWall()) {
-                        label.setText(String.valueOf('\u221e'));
-                        label.getStyleClass().add("white");
+        map.getGrid().forEach(cells -> {
+            cells.forEach(cell -> {
+                Pane currentPane = (Pane) getNodeFromGridPane(centerPane, (int) cell.getIndex().i, (int) cell.getIndex().j);
+                if (currentPane != null) {
+                    if (currentPane.getChildren().size() > 0) {
+                        Label label = (Label) currentPane.getChildren().get(0);
+                        label.setText(String.valueOf(Math.round(map.getGrid().get((int) cell.getIndex().i).get((int) cell.getIndex().j).getF_score() * 100.0) / 100.0));
+                        if (cell.isWall()) {
+                            label.setText(String.valueOf('\u221e'));
+                            label.getStyleClass().add("white");
+                        }
+                    }
+                    if (cell.isVisited() && !cell.isWall() && !cell.isStart() && !cell.isCheckPoint() && !cell.isRobotPosition()) {
+                        currentPane.getStyleClass().add("visited");
+                    }
+                    currentPane.getStyleClass().removeAll("robot");
+                    if (cell.isRobotPosition()) {
+//                        currentPane.getStyleClass().removeAll("visited");
+                        if (cell.isWall()) currentPane.getStyleClass().removeAll("wall");
+                        currentPane.getStyleClass().add("robot");
                     }
                 }
-                if (cell.isVisited() && !cell.isWall() && !cell.isStart() && !cell.isCheckPoint()) {
-                    currentPane.getStyleClass().add("visited");
-                }
-                currentPane.getStyleClass().removeAll("robot");
-                if (cell.isRobotPosition()) {
-                    currentPane.getStyleClass().add("robot");
-                }
-            }
-        }));
+
+            });
+        });
     }
 
     void reset() {

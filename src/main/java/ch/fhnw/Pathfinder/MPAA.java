@@ -36,11 +36,6 @@ public class MPAA extends Pathfinder {
     }
 
     @Override
-    public ArrayList<Cell> getShortestPath() {
-        return null;
-    }
-
-    @Override
     public ArrayList<Cell> getLocalPath() {
         return null;
     }

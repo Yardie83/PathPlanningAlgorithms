@@ -56,7 +56,7 @@ public class AStar extends Pathfinder {
         if (currentCell == null) return;
         currentCell.setRobotPosition(true);
         robotCell.setRobotPosition(false);
-        currentCell.setCameFrom(new Pair(robotCell.getIndex().i, robotCell.getIndex().j));
+        currentCell.setCameFrom(new Pair<>(robotCell.getIndex().i, robotCell.getIndex().j));
         robotCell = currentCell;
         currentCell.setVisited(true);
         openList.remove(currentCell);

@@ -71,7 +71,12 @@ public class AStar extends Pathfinder {
             }));
 
             currentCell.setStart(true);
+
+            openList.clear();
+            closedList.clear();
+
             map.getGrid().forEach(cells -> cells.forEach(cell -> {
+                cell.setVisited(false);
                 cell.setG_score(1);
                 if (cell.isStart()) {
                     cell.setF_score(0);
@@ -81,7 +86,8 @@ public class AStar extends Pathfinder {
                 if (cell.isWall()) cell.setF_score(Integer.MAX_VALUE);
             }));
 
-            //map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isStart).findFirst().ifPresent(startCell -> openList.add(startCell));
+            map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isStart).findFirst().ifPresent(startCell -> openList.add(startCell));
+
         }
 
         if (lastCheckPointFound()) return;

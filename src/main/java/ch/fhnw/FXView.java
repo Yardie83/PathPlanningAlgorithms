@@ -425,7 +425,7 @@ class FXView {
     }
 
     void appendOutputText(String text) {
-        textArea.appendText(text) ;
+        textArea.appendText(text);
     }
 
     void clearOutputText() {
@@ -511,7 +511,7 @@ class FXView {
                     map.getGrid().forEach(cellArrayList -> cellArrayList.forEach(cell -> {
                         if (cell.isStart()) {
                             cell.setStart(false);
-                            Pane currentStart = (Pane) getNodeFromGridPane(centerPane, (int)cell.getIndex().i, (int)cell.getIndex().j);
+                            Pane currentStart = (Pane) getNodeFromGridPane(centerPane, (int) cell.getIndex().i, (int) cell.getIndex().j);
                             if (currentStart != null) {
                                 currentStart.getStyleClass().removeAll("start");
                             }
@@ -531,7 +531,7 @@ class FXView {
                 selectedCell.setCheckPoint(false);
                 pane.getStyleClass().removeAll("checkpoint");
                 selectedCell.setStart(false);
-                map.getCheckPoints().remove(map.getCheckPoints().indexOf(selectedCell));
+                map.getCheckPoints().remove(selectedCell);
                 pane.getStyleClass().removeAll("start");
             }
         }
@@ -546,7 +546,7 @@ class FXView {
         map.getPath().forEach(cell -> {
             if (cell.isVisited() && !cell.isWall() && !cell.isStart() && !cell.isCheckPoint()) {
 
-                Pane pane = (Pane) getNodeFromGridPane(centerPane, (int)cell.getIndex().i, (int)cell.getIndex().j);
+                Pane pane = (Pane) getNodeFromGridPane(centerPane, (int) cell.getIndex().i, (int) cell.getIndex().j);
                 if (pane != null) {
                     pane.getStyleClass().removeAll("visited");
                     pane.getStyleClass().add("path");
@@ -571,11 +571,11 @@ class FXView {
 
     void updateMap() {
         map.getGrid().forEach(cells -> cells.forEach(cell -> {
-            Pane currentPane = (Pane) getNodeFromGridPane(centerPane, (int)cell.getIndex().i, (int)cell.getIndex().j);
+            Pane currentPane = (Pane) getNodeFromGridPane(centerPane, (int) cell.getIndex().i, (int) cell.getIndex().j);
             if (currentPane != null) {
                 if (currentPane.getChildren().size() > 0) {
                     Label label = (Label) currentPane.getChildren().get(0);
-                    label.setText(String.valueOf(Math.round(map.getGrid().get((int)cell.getIndex().i).get((int)cell.getIndex().j).getF_score() * 100.0) / 100.0));
+                    label.setText(String.valueOf(Math.round(map.getGrid().get((int) cell.getIndex().i).get((int) cell.getIndex().j).getF_score() * 100.0) / 100.0));
                     if (cell.isWall()) {
                         label.setText(String.valueOf('\u221e'));
                         label.getStyleClass().add("white");
@@ -594,7 +594,7 @@ class FXView {
 
     void reset() {
         map.getGrid().forEach(cells -> cells.forEach(cell -> {
-            Pane currentPane = (Pane) getNodeFromGridPane(centerPane, (int)cell.getIndex().i, (int)cell.getIndex().j);
+            Pane currentPane = (Pane) getNodeFromGridPane(centerPane, (int) cell.getIndex().i, (int) cell.getIndex().j);
             if (currentPane != null) {
                 if (currentPane.getChildren().size() > 0) {
                     Label label = (Label) currentPane.getChildren().get(0);

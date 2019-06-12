@@ -123,8 +123,11 @@ class FXController {
 
     private void handleStep() {
         if (!isSetup) {
-            simulationSetup();
-            view.reset();
+            view.clearOutputText();
+            if (!simulationSetup()) {
+                view.reset();
+                simulationStop();
+            }
         }
         if (pathfinder.isRunning) {
             pathfinder.step();
@@ -136,7 +139,7 @@ class FXController {
         isSetup = false;
     }
 
-    private void simulationSetup() {
+    private boolean simulationSetup() {
         //     Get all the user options (Emotion options, Simulation options)
 
 //        Emotion options
@@ -163,15 +166,16 @@ class FXController {
 
             if (map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isStart).findAny().isEmpty()) {
                 view.appendOutputText("Add a start point");
-                return;
+                return false;
             }
             if (map.getCheckPoints().isEmpty()) {
                 view.appendOutputText("Add a checkpoint");
-                return;
+                return false;
             }
         }
         view.appendOutputText("-------------------------------------------------------------------------------\n");
         isSetup = true;
+        return true;
     }
 
 

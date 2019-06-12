@@ -49,6 +49,12 @@ public class Cell implements Comparable, Cloneable {
         return null;
     }
 
+
+    public boolean sameIndex(Object obj) {
+        Cell other = (Cell) obj;
+        return this.getIndex().i == other.getIndex().i && this.getIndex().j == other.getIndex().j;
+    }
+
     public boolean isStart() {
         return isStart;
     }

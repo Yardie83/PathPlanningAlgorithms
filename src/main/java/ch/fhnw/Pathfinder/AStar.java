@@ -36,9 +36,8 @@ public class AStar extends Pathfinder {
             if (cell.isStart()) {
                 cell.setF_score(0);
                 cell.setRobotPosition(true);
-                robotCell = cell;
-                currentCell = cell;
-                localPath.add(robotCell);
+                lastCell = currentCell = cell;
+                localPath.add(currentCell);
             }
             if (cell.isWall()) cell.setF_score(Integer.MAX_VALUE);
         }));
@@ -61,79 +60,99 @@ public class AStar extends Pathfinder {
             isRunning = false;
             return;
         }
+        System.out.println("============= START ==============================");
+        System.out.println("CurrentCell: " + currentCell.getIndex().i + ":" + currentCell.getIndex().j);
+        if (isNeighbour) {
+            currentCell = getLowestDistanceCell();
+            System.out.println(currentCell);
+            System.out.println("New lowest: " + currentCell.getIndex().i + ":" + currentCell.getIndex().j);
+        }
 
-        if (isNeighbour) currentCell = getLowestDistanceCell();
-        if (currentCell == null) return;
+        if (currentCell != null) {
+            currentCell.setRobotPosition(true);
+            lastCell.setRobotPosition(false);
 
-        currentCell.setRobotPosition(true);
-        robotCell.setRobotPosition(false);
+            System.out.println("============= CURRENT / LAST ======================");
+            if (!currentCell.sameIndex(lastCell)) {
+                isNeighbour = false;
+                System.out.println("CurrentCell: " + currentCell.getIndex().i + ":" + currentCell.getIndex().j);
+                System.out.println("LastCell: " + lastCell.getIndex().i + ":" + lastCell.getIndex().j);
+                System.out.println("============= NEIGHBOURS ======================");
+                getNeighbours(currentCell).forEach(cell -> {
+                    System.out.println("NeighbourCell: " + cell.getIndex().i + ":" + cell.getIndex().j);
+                    if (cell.sameIndex(lastCell)) {
+                        System.out.println("============= NEIGHBOUR TRUE ======================");
+                        isNeighbour = true;
+                    }
+                });
 
-        ArrayList<Cell> currentCellNeighbours = getNeighbours(currentCell);
-
-        if (currentCell != robotCell) {
-            isNeighbour = false;
-            for (Cell currentCellNeighbour : currentCellNeighbours) {
-                if (currentCellNeighbour.getIndex().i == robotCell.getIndex().i && currentCellNeighbour.getIndex().j == robotCell.getIndex().j) {
-                    isNeighbour = true;
-                }
-            }
-
-            if (!isNeighbour) {
-                if (localPath.size() > 1 && !currentCell.isStart()) {
-                    for (int i = 0; i < localPath.size(); i++) {
-                        Cell localPathCell = localPath.get(i);
-                        if (localPathCell.getIndex().i == robotCell.getIndex().i && localPathCell.getIndex().j == robotCell.getIndex().j) {
-                            currentCell.setRobotPosition(false);
-                            currentCell = localPath.get(localPath.indexOf(localPathCell) - 1);
-                            System.out.println("[Changed CurrentCell]" + currentCell.getIndex().i + ":" + currentCell.getIndex().j + ", [F-Score]" + currentCell.getF_score());
-                            currentCell.setRobotPosition(true);
+                if (!isNeighbour) {
+                    System.out.println("============= LOCAL PATH ======================");
+                    Optional<Cell> first = localPath.stream().filter(localCell -> localCell.sameIndex(lastCell)).findFirst();
+                    if (first.isPresent()) {
+                        Cell cell = first.get();
+                        System.out.println("Cell found: " + cell.getIndex().i + ":" + cell.getIndex().j);
+                        if (localPath.indexOf(cell) > 0) {
+                            System.out.println(localPath.get(localPath.indexOf(cell) - 1).getIndex().i + ":" + localPath.get(localPath.indexOf(cell) - 1).getIndex().j);
+                            currentCell = localPath.get(localPath.indexOf(cell) - 1);
                             return;
                         }
                     }
+                    return;
                 }
-                return;
             }
+            System.out.println("============= NOT Returned PATH ======================");
             isNeighbour = true;
+
+            currentCell.setRobotPosition(false);
+            currentCell.setVisited(true);
+            localPath.add(currentCell);
+            lastCell = (Cell) currentCell.clone();
+            map.getGrid().forEach(cells ->{cells.forEach(cell -> {
+                cell.setRobotPosition(false);
+                if (cell.sameIndex(lastCell)){
+                    cell.setRobotPosition(true);
+                }
+            });} );
+
+            openList.remove(currentCell);
+            closedList.add(currentCell);
+
+            checkForCheckPoint();
+            if (checkForLastCheckPoint()) return;
+
+            updateNeighbours();
         }
-        System.out.println("[UnChanged CurrentCell]" + currentCell.getIndex().i + ":" + currentCell.getIndex().j + ", [F-Score]" + currentCell.getF_score());
-        currentCell.setCameFrom(new Pair<>(robotCell.getIndex().i, robotCell.getIndex().j));
-        currentCell.setRobotPosition(false);
-        robotCell = currentCell;
-        robotCell.setRobotPosition(true);
+    }
 
-        if (!(localPath.get(localPath.size() - 1).getIndex().i == robotCell.getIndex().i && localPath.get(localPath.size() - 1).getIndex().j == robotCell.getIndex().j)) {
-            localPath.add((Cell) robotCell.clone());
+    private boolean checkForLastCheckPoint() {
+        if (lastCheckPointFound()) {
+            return true;
         }
+        return false;
+    }
 
-        currentCell.setVisited(true);
-        openList.remove(currentCell);
-        closedList.add(currentCell);
-
+    private void checkForCheckPoint() {
         if (checkPointFound(currentCell)) {
-
             map.getGrid().forEach(cells -> cells.forEach(cell -> {
                 if (cell.isStart()) {
                     cell.setStart(false);
                 }
             }));
 
-            currentCell.setStart(true);
-
             openList.clear();
             closedList.clear();
-
             openList.add(currentCell);
 
             map.getGrid().forEach(cells -> cells.forEach(cell -> cell.setVisited(false)));
         }
+    }
 
-        if (lastCheckPointFound()) return;
-
-
+    private void updateNeighbours() {
         ArrayList<Cell> neighboursCells = getNeighbours(currentCell);
-        List<Cell> neighbours = neighboursCells.stream().filter(cell -> (!closedList.contains(cell))).collect(Collectors.toList());
+//        List<Cell> neighbours = neighboursCells.stream().filter(cell -> (!closedList.contains(cell))).collect(Collectors.toList());
 
-        neighbours.forEach(neighbourCell ->
+        neighboursCells.forEach(neighbourCell ->
         {
             neighbourCell.setF_score(heuristic(neighbourCell, checkPoints.get(0)));
             if (!openList.contains(neighbourCell) && !neighbourCell.isWall() && !neighbourCell.isVisited()) {
@@ -141,6 +160,7 @@ public class AStar extends Pathfinder {
             }
         });
     }
+
 
     private Cell getLowestDistanceCell() {
         Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getF_score));

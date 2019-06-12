@@ -539,11 +539,11 @@ class FXView {
         });
 
         map.getPath().forEach(cell -> {
-                Pane pane = (Pane) getNodeFromGridPane(centerPane, (int) cell.getIndex().i, (int) cell.getIndex().j);
-                if (pane != null) {
-                    pane.getStyleClass().removeAll("visited");
-                    pane.getStyleClass().add("path");
-                }
+            Pane pane = (Pane) getNodeFromGridPane(centerPane, (int) cell.getIndex().i, (int) cell.getIndex().j);
+            if (pane != null) {
+                pane.getStyleClass().removeAll("visited");
+                pane.getStyleClass().add("path");
+            }
         });
 
     }
@@ -581,8 +581,7 @@ class FXView {
                     }
                     currentPane.getStyleClass().removeAll("robot");
                     if (cell.isRobotPosition()) {
-//                        currentPane.getStyleClass().removeAll("visited");
-                        if (cell.isWall()) currentPane.getStyleClass().removeAll("wall");
+                        currentPane.getStyleClass().removeAll("visited");
                         currentPane.getStyleClass().add("robot");
                     }
                 }

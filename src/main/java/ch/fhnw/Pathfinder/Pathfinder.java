@@ -4,13 +4,8 @@ import ch.fhnw.Cell;
 import ch.fhnw.Map;
 import ch.fhnw.util.Distance;
 import ch.fhnw.util.Moves;
-import ch.fhnw.util.Pair;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public abstract class Pathfinder {
 
@@ -22,7 +17,7 @@ public abstract class Pathfinder {
     ArrayList<Cell> openList;
     ArrayList<Cell> closedList;
     ArrayList<Cell> checkPoints;
-    Cell robotCell;
+    Cell lastCell;
     Cell currentCell;
     ArrayList<Cell> path;
 
@@ -33,7 +28,7 @@ public abstract class Pathfinder {
         checkPoints = new ArrayList<>();
         checkPoints.addAll(map.getCheckPoints());
         path = new ArrayList<>();
-        robotCell = currentCell;
+        lastCell = currentCell;
     }
 
     ;

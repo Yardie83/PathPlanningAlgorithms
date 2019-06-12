@@ -25,7 +25,7 @@ class Dijkstra extends Pathfinder {
             if (cell.isStart()) {
                 cell.setDistance(0);
                 cell.setRobotPosition(true);
-                robotCell = cell;
+                lastCell = cell;
             }
             if (cell.isWall()) cell.setG_score(Integer.MAX_VALUE);
             openList.add(cell);
@@ -37,10 +37,10 @@ class Dijkstra extends Pathfinder {
             isRunning = false;
             return;
         }
-        robotCell.setRobotPosition(false);
+        lastCell.setRobotPosition(false);
         currentCell = getLowestDistanceCell();
         currentCell.setRobotPosition(true);
-        robotCell = currentCell;
+        lastCell = currentCell;
         currentCell.setVisited(true);
         openList.remove(currentCell);
         if (checkPointFound(currentCell)) return;

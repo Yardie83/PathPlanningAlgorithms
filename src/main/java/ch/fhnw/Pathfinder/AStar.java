@@ -67,7 +67,6 @@ public class AStar extends Pathfinder {
 
             currentCell.setRobotPosition(false);
             currentCell.setVisited(true);
-
             incrementNoveltyCellValue(currentCell);
             localPath.add(currentCell);
             lastCell = (Cell) currentCell.clone();
@@ -77,6 +76,9 @@ public class AStar extends Pathfinder {
                     cell.setRobotPosition(false);
                     if (cell.sameIndex(lastCell)) {
                         cell.setRobotPosition(true);
+                    }
+                    if (cell.sameIndex(currentCell)) {
+                        cell.setG_score(currentCell.getG_score());
                     }
                 });
             });
@@ -126,7 +128,7 @@ public class AStar extends Pathfinder {
 
         neighboursCells.forEach(neighbourCell ->
         {
-            neighbourCell.setF_score(heuristic(neighbourCell, checkPoints.get(0)));
+            neighbourCell.setF_score(heuristic(neighbourCell, checkPoints.get(0)) + neighbourCell.getG_score());
             if (!openList.contains(neighbourCell) && !neighbourCell.isWall() && !neighbourCell.isVisited()) {
                 openList.add(neighbourCell);
             }

@@ -127,6 +127,12 @@ public class AStar extends Pathfinder {
 
     }
 
+    private void incrementNoveltyCellValue(Cell currentCell) {
+        if (!currentCell.isStart()) {
+            currentCell.setF_score(currentCell.getF_score() + 1.5);
+        }
+    }
+
     private boolean checkForLastCheckPoint() {
         if (lastCheckPointFound()) {
             return true;

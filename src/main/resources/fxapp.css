@@ -95,11 +95,11 @@
 }
 
 .path{
-    -fx-background-color: #db6b65;
+    -fx-background-color: #d126db;
 }
 
 .visited{
-    -fx-background-color: rgba(255, 47, 85, 0.32);
+    -fx-background-color: rgba(78, 255, 151, 0.32);
 }
 
 .robot{

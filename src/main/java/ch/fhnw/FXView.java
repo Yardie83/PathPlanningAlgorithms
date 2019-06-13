@@ -594,12 +594,11 @@ class FXView {
                             label.getStyleClass().add("white");
                         }
                     }
-                    if (cell.isVisited() && !cell.isWall() && !cell.isStart() && !cell.isCheckPoint() && !cell.isRobotPosition()) {
+                    if (cell.isVisited() && !cell.isWall() && !cell.isStart() && !cell.isCheckPoint()) {
                         currentPane.getStyleClass().add("visited");
                     }
                     currentPane.getStyleClass().removeAll("robot");
                     if (cell.isRobotPosition()) {
-                        currentPane.getStyleClass().removeAll("visited");
                         currentPane.getStyleClass().add("robot");
                     }
                 }

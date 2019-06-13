@@ -67,7 +67,7 @@ public class AStar extends Pathfinder {
 
             currentCell.setRobotPosition(false);
             currentCell.setVisited(true);
-            incrementNoveltyCellValue(currentCell);
+            if (noveltyActive) incrementNoveltyCellValue(currentCell);
             localPath.add(currentCell);
             lastCell = (Cell) currentCell.clone();
 
@@ -95,9 +95,7 @@ public class AStar extends Pathfinder {
     }
 
     private void incrementNoveltyCellValue(Cell currentCell) {
-        if (!currentCell.isStart()) {
-            currentCell.setG_score(currentCell.getG_score() + 2);
-        }
+        currentCell.setG_score(currentCell.getG_score() + 2);
     }
 
     private boolean checkForLastCheckPoint() {
@@ -128,7 +126,7 @@ public class AStar extends Pathfinder {
 
         neighboursCells.forEach(neighbourCell ->
         {
-            neighbourCell.setF_score(heuristic(neighbourCell, checkPoints.get(0)) + neighbourCell.getG_score());
+            neighbourCell.setF_score(heuristic(neighbourCell, checkPoints.get(0)));
             if (!openList.contains(neighbourCell) && !neighbourCell.isWall() && !neighbourCell.isVisited()) {
                 openList.add(neighbourCell);
             }
@@ -137,15 +135,25 @@ public class AStar extends Pathfinder {
 
 
     private Cell getLowestDistanceCell() {
-        Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getF_score));
-        Cell cell = minDistanceCell.orElse(null);
-        if (cell != null && cell.isWall()) {
+        double f_min = Double.POSITIVE_INFINITY;
+        Cell minDistCell = null;
+        for (ArrayList<Cell> cells : map.getGrid()) {
+            for (Cell cell : cells) {
+                if (cell.getF_score() < f_min) {
+                    minDistCell = cell;
+                    f_min = cell.getF_score();
+                }
+            }
+        }
+
+        if (minDistCell != null && minDistCell.isWall()) {
 //            TODO: Add penalty time and return null
-            cell.setVisited(true);
-            openList.remove(cell);
+            minDistCell.setVisited(true);
+            openList.remove(minDistCell);
+
             return null;
         }
-        return cell;
+        return minDistCell;
     }
 
     public ArrayList<Cell> getLocalPath() {

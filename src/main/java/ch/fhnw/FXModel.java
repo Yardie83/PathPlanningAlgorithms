@@ -2,7 +2,6 @@ package ch.fhnw;
 
 class FXModel {
 
-
     Map createNewMap(int mapSize) {
         return MapFactory.getNewMap(mapSize);
     }

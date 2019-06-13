@@ -37,7 +37,6 @@ public class AStar extends Pathfinder {
                 cell.setF_score(0);
                 cell.setRobotPosition(true);
                 lastCell = currentCell = cell;
-
             }
             if (cell.isWall()) cell.setF_score(Integer.MAX_VALUE);
         }));
@@ -139,9 +138,15 @@ public class AStar extends Pathfinder {
         Cell minDistCell = null;
         for (ArrayList<Cell> cells : map.getGrid()) {
             for (Cell cell : cells) {
-                if (cell.getF_score() < f_min) {
-                    minDistCell = cell;
-                    f_min = cell.getF_score();
+                for (Cell openListCell :
+                        openList) {
+                    if (cell.sameIndex(openListCell)) {
+                        if (cell.getF_score() < f_min) {
+                            minDistCell = cell;
+                            f_min = cell.getF_score();
+
+                        }
+                    }
                 }
             }
         }

@@ -68,7 +68,8 @@ public class Map {
         checkPoints.add(grid.get(21).get(26));
 
         grid.get(24).get(28).setStart(true);
-        checkPoints.add(grid.get(24).get(28));
+
+        System.out.println(checkPoints.size());
 
     }
 
@@ -92,6 +93,8 @@ public class Map {
         grid.get(50).get(9).setCheckPoint(true);
         grid.get(1).get(63).setCheckPoint(true);
 
+        System.out.println(checkPoints.size());
+
         grid.get(0).get(0).setStart(true);
     }
 
@@ -105,6 +108,7 @@ public class Map {
 
 
     public ArrayList<Cell> getCheckPoints() {
+        System.out.println(checkPoints.size());
         return checkPoints;
     }
 

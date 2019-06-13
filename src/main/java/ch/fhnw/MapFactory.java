@@ -8,7 +8,6 @@ class MapFactory {
 
     static Map getOriginalMap(int mapIndex) {
         Map map = null;
-        System.out.println("Mapindex: " + mapIndex);
         if (mapIndex == 0) {
             map = new Map(32);
             map.addStairsSimulationFeatures();

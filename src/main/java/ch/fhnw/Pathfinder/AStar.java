@@ -37,7 +37,7 @@ public class AStar extends Pathfinder {
                 cell.setF_score(0);
                 cell.setRobotPosition(true);
                 lastCell = currentCell = cell;
-                localPath.add(currentCell);
+
             }
             if (cell.isWall()) cell.setF_score(Integer.MAX_VALUE);
         }));
@@ -53,6 +53,7 @@ public class AStar extends Pathfinder {
 //    5. if wall then add time and step and remove cell from openList
 //    6 repeat
     private boolean isNeighbour = true;
+    private int localPathBackIndex = -1;
 
     @Override
     public void step() {
@@ -60,63 +61,70 @@ public class AStar extends Pathfinder {
             isRunning = false;
             return;
         }
-
+        if (isNeighbour) {
+            currentCell = getLowestDistanceCell();
+        }
         if (currentCell != null) {
+            System.out.println("CurrentCell : " + currentCell.getIndex().i + ":" + currentCell.getIndex().j + " | ");
             currentCell.setRobotPosition(true);
             lastCell.setRobotPosition(false);
 
-            System.out.println("============= CURRENT / LAST ======================");
             if (!currentCell.sameIndex(lastCell)) {
                 isNeighbour = false;
-                System.out.println("CurrentCell: " + currentCell.getIndex().i + ":" + currentCell.getIndex().j);
-                System.out.println("LastCell: " + lastCell.getIndex().i + ":" + lastCell.getIndex().j);
-                System.out.println("============= NEIGHBOURS ======================");
                 getNeighbours(currentCell).forEach(cell -> {
-                    System.out.println("NeighbourCell: " + cell.getIndex().i + ":" + cell.getIndex().j);
                     if (cell.sameIndex(lastCell)) {
-                        System.out.println("============= NEIGHBOUR TRUE ======================");
                         isNeighbour = true;
+                        localPathBackIndex = localPath.size() - 1;
                     }
                 });
 
                 if (!isNeighbour) {
-                    System.out.println("============= LOCAL PATH ======================");
-                    Optional<Cell> first = localPath.stream().filter(localCell -> localCell.sameIndex(lastCell)).findFirst();
-                    if (first.isPresent()) {
-                        Cell cell = first.get();
-                        System.out.println("Cell found: " + cell.getIndex().i + ":" + cell.getIndex().j);
-                        if (localPath.indexOf(cell) > 0) {
-                            System.out.println(localPath.get(localPath.indexOf(cell) - 1).getIndex().i + ":" + localPath.get(localPath.indexOf(cell) - 1).getIndex().j);
-                            currentCell = localPath.get(localPath.indexOf(cell) - 1);
-                            return;
+                    localPathBackIndex = localPathBackIndex-1;
+                    System.out.println(localPathBackIndex);
+                    localPath.forEach(cell -> System.out.print(cell.getIndex().i + ":" + cell.getIndex().j + " | "));
+                    System.out.println(" | ");
+                    for (int i = localPath.size() - 1; i >= 0; i--) {
+                        Cell cell = localPath.get(i);
+                        if (cell.sameIndex(lastCell)) {
+
+                            if (localPath.size() > 0 && localPath.indexOf(cell) > 1) {
+                                if (!localPath.get(localPath.size() - 1).sameIndex(currentCell)) {
+//                                    localPath.add(cell);
+                                    currentCell = localPath.get(localPathBackIndex);
+                                    return;
+                                }
+                                return;
+                            }
                         }
                     }
-                    return;
+                    System.out.println("\n");
+//                    return;
                 }
             }
             isNeighbour = true;
-        }
 
-        currentCell.setCameFrom(new Pair<>(robotCell.getIndex().i, robotCell.getIndex().j));
-        robotCell = currentCell;
+            currentCell.setRobotPosition(false);
+            currentCell.setVisited(true);
+            localPath.add(currentCell);
+            lastCell = (Cell) currentCell.clone();
+            map.getGrid().forEach(cells -> {
+                cells.forEach(cell -> {
+                    cell.setRobotPosition(false);
+                    if (cell.sameIndex(lastCell)) {
+                        cell.setRobotPosition(true);
+                    }
+                });
+            });
 
-        if (noveltyActive) {
-            incrementNoveltyCellValue(currentCell);
-        }
-
-        if (!(localPath.get(localPath.size() - 1).getIndex().i == robotCell.getIndex().i && localPath.get(localPath.size() - 1).getIndex().j == robotCell.getIndex().j)) {
-            localPath.add((Cell) robotCell.clone());
-        }
-
-        currentCell.setVisited(true);
-        openList.remove(currentCell);
-        closedList.add(currentCell);
+            openList.remove(currentCell);
+            closedList.add(currentCell);
 
             checkForCheckPoint();
             if (checkForLastCheckPoint()) return;
 
             updateNeighbours();
         }
+
     }
 
     private boolean checkForLastCheckPoint() {
@@ -128,18 +136,14 @@ public class AStar extends Pathfinder {
 
     private void checkForCheckPoint() {
         if (checkPointFound(currentCell)) {
-
             map.getGrid().forEach(cells -> cells.forEach(cell -> {
                 if (cell.isStart()) {
                     cell.setStart(false);
                 }
             }));
 
-            currentCell.setStart(true);
-
             openList.clear();
             closedList.clear();
-
             openList.add(currentCell);
 
             map.getGrid().forEach(cells -> cells.forEach(cell -> cell.setVisited(false)));
@@ -159,11 +163,6 @@ public class AStar extends Pathfinder {
         });
     }
 
-    private void incrementNoveltyCellValue(Cell currentCell) {
-        if (!currentCell.isStart()) {
-            currentCell.setF_score(currentCell.getF_score() + 1.5);
-        }
-    }
 
     private Cell getLowestDistanceCell() {
         Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getF_score));

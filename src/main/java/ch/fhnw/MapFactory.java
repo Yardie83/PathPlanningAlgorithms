@@ -7,13 +7,15 @@ class MapFactory {
     }
 
     static Map getOriginalMap(int mapIndex) {
-        Map map = new Map(32);
-        System.out.println("Mapindex: "+ mapIndex);
+        Map map = null;
+        System.out.println("Mapindex: " + mapIndex);
         if (mapIndex == 0) {
+            map = new Map(32);
             map.addStairsSimulationFeatures();
         }
 
         if (mapIndex == 1) {
+            map = new Map(64);
             map.addTheWallMapFeatures();
         }
         return map;

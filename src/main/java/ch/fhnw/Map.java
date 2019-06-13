@@ -69,8 +69,6 @@ public class Map {
 
         grid.get(24).get(28).setStart(true);
 
-        System.out.println(checkPoints.size());
-
     }
 
     void addTheWallMapFeatures() {
@@ -92,11 +90,9 @@ public class Map {
         grid.get(10).get(30).setCheckPoint(true);
         checkPoints.add(grid.get(10).get(30));
         grid.get(50).get(9).setCheckPoint(true);
-        checkPoints.add(grid.get(50).get(11));
+        checkPoints.add(grid.get(50).get(9));
         grid.get(1).get(63).setCheckPoint(true);
         checkPoints.add(grid.get(1).get(63));
-
-        System.out.println(checkPoints.size());
 
         grid.get(0).get(0).setStart(true);
     }
@@ -111,7 +107,6 @@ public class Map {
 
 
     public ArrayList<Cell> getCheckPoints() {
-        System.out.println(checkPoints.size());
         return checkPoints;
     }
 

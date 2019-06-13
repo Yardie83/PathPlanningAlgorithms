@@ -3,10 +3,8 @@ package ch.fhnw.Pathfinder;
 import ch.fhnw.Cell;
 import ch.fhnw.util.Pair;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.awt.geom.Point2D;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AStar extends Pathfinder {
@@ -24,11 +22,22 @@ public class AStar extends Pathfinder {
 
     ArrayList<Cell> localPath;
 
+    private int bumps;
+    private int steps;
+    private int confidentSteps;
+    private Cell bumpCell;
+    private HashMap<Cell, Integer> bumpRemember = new HashMap<>();
+
+    private double totalTime;
+
     @Override
     public void init() {
         super.init();
 
         localPath = new ArrayList<>();
+        bumps = 0;
+        steps = -1;
+        confidentSteps = 0;
 
         map.getGrid().forEach(cells -> cells.forEach(cell -> {
             cell.setVisited(false);
@@ -38,7 +47,6 @@ public class AStar extends Pathfinder {
                 cell.setRobotPosition(true);
                 lastCell = currentCell = cell;
             }
-            if (cell.isWall()) cell.setF_score(Integer.MAX_VALUE);
         }));
 
         map.getGrid().stream().flatMap(List::stream).collect(Collectors.toList()).stream().filter(Cell::isStart).findFirst().ifPresent(startCell -> openList.add(startCell));
@@ -60,7 +68,17 @@ public class AStar extends Pathfinder {
         }
         currentCell = getLowestDistanceCell();
 
-        if (currentCell != null) {
+        if (explorationActive && currentCell != null) {
+            activateExplorativeMode();
+        }
+
+        if (currentCell != null && !currentCell.isWall()) {
+
+            if (confidenceActive && currentCell.isVisited()) {
+                confidentSteps++;
+            }
+
+            steps++;
             currentCell.setRobotPosition(true);
             lastCell.setRobotPosition(false);
 
@@ -93,25 +111,96 @@ public class AStar extends Pathfinder {
 
     }
 
+
+    private void activateExplorativeMode() {
+
+        // remove bumps that are too old (10 steps)
+        // increase for others
+        if (!bumpRemember.isEmpty() && bumpCell != null) {
+            for (Iterator<HashMap.Entry<Cell, Integer>> it = bumpRemember.entrySet().iterator(); it.hasNext(); ) {
+                HashMap.Entry<Cell, Integer> entry = it.next();
+                if (entry.getValue() > 10) {
+                    it.remove();
+                } else {
+                    entry.setValue(entry.getValue() + 1);
+                }
+            }
+        }
+
+        if (bumpCell == null) {
+            bumpCell = currentCell;
+        }
+
+        // if > 3 bumps, calculate jump-point
+        if (bumpRemember.size() > 3) {
+            int avgX = 0;
+            int avgY = 0;
+            for (Cell bumpCell : bumpRemember.keySet()) {
+                avgX += (int) bumpCell.getIndex().i;
+                avgY += (int) bumpCell.getIndex().j;
+            }
+            // bump center
+            avgX = Math.round((float) avgX / bumpRemember.size());
+            avgY = Math.round((float) avgY / bumpRemember.size());
+
+            // mirror actual position to bump-center
+            int goX = (int) currentCell.getIndex().i + ((int) currentCell.getIndex().i - avgX);
+            int goY = (int) currentCell.getIndex().j + ((int) currentCell.getIndex().j - avgY);
+
+            goX = Math.min(map.getGrid().size() - 1, goX);
+            goX = Math.max(goX, 0);
+            goY = Math.max(goY, 0);
+            goY = Math.min(map.getGrid().size() - 1, goY);
+
+            int finalGoX = goX;
+            int finalGoY = goY;
+
+            map.getGrid().forEach(cells -> cells.forEach(cell -> {
+                if ((int) cell.getIndex().i == finalGoX && (int) cell.getIndex().j == finalGoY) currentCell = cell;
+            }));
+
+            bumpRemember.clear();
+        }
+    }
+
     private void incrementNoveltyCellValue(Cell currentCell) {
         currentCell.setG_score(currentCell.getG_score() + 2);
     }
 
     private boolean checkForLastCheckPoint() {
         if (lastCheckPointFound()) {
+            calculateFinalValues();
             return true;
         }
         return false;
     }
 
+    private void calculateFinalValues() {
+
+        totalTime = steps * 4;
+        totalTime += bumps * 4;
+
+        if (happyActive) {
+            totalTime = steps / 2;
+            double penaltyTime = bumps * 1 * 2 * 4;
+            totalTime += penaltyTime;
+        }
+
+        if (confidenceActive) {
+            //Normal steps
+            totalTime = (steps - confidentSteps) / 2;
+
+            //Confident steps
+            totalTime += confidentSteps / 4;
+        }
+
+        System.out.println("Total Time: " + totalTime);
+        System.out.println("Bumps " + bumps);
+        System.out.println("Steps " + steps);
+    }
+
     private void checkForCheckPoint() {
         if (checkPointFound(currentCell)) {
-            map.getGrid().forEach(cells -> cells.forEach(cell -> {
-                if (cell.isStart()) {
-                    cell.setStart(false);
-                }
-            }));
-
             openList.clear();
             closedList.clear();
             openList.add(currentCell);
@@ -126,7 +215,7 @@ public class AStar extends Pathfinder {
         neighboursCells.forEach(neighbourCell ->
         {
             neighbourCell.setF_score(heuristic(neighbourCell, checkPoints.get(0)));
-            if (!openList.contains(neighbourCell) && !neighbourCell.isWall() && !neighbourCell.isVisited()) {
+            if (!openList.contains(neighbourCell) && !neighbourCell.isVisited()) {
                 openList.add(neighbourCell);
             }
         });
@@ -152,16 +241,40 @@ public class AStar extends Pathfinder {
         }
 
         if (minDistCell != null && minDistCell.isWall()) {
-//            TODO: Add penalty time and return null
+            System.out.println("is this cell visited? " + minDistCell.isVisited());
+
+            bumps++;
+            bumpRemember.put(minDistCell, 0);
+
+
             minDistCell.setVisited(true);
+            minDistCell.setF_score(Integer.MAX_VALUE);
+
             openList.remove(minDistCell);
 
             return null;
+
         }
         return minDistCell;
     }
 
     public ArrayList<Cell> getLocalPath() {
         return localPath;
+    }
+
+    public Cell getBumpCell() {
+        return bumpCell;
+    }
+
+    public int getBumps() {
+        return bumps;
+    }
+
+    public int getSteps() {
+        return steps;
+    }
+
+    public double getTotalTime() {
+        return totalTime;
     }
 }

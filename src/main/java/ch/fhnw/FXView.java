@@ -579,8 +579,6 @@ class FXView {
         map.setPath(shortestPath);
     }
 
-    private int iteration = 0;
-
     void updateMap() {
         map.getGrid().forEach(cells -> {
             cells.forEach(cell -> {
@@ -602,7 +600,6 @@ class FXView {
                         currentPane.getStyleClass().add("robot");
                     }
                 }
-
             });
         });
     }

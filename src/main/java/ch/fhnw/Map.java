@@ -16,7 +16,8 @@ public class Map {
         for (int i = 0; i < mapSize; i++) {
             grid.add(new ArrayList<>());
             for (int j = 0; j < mapSize; j++) {
-                grid.get(i).add(new Cell(new Pair(i, j)));
+                Cell cell = new Cell(new Pair<>(i, j));
+                grid.get(i).add(cell);
             }
         }
     }
@@ -61,9 +62,13 @@ public class Map {
         }
 
         grid.get(5).get(11).setCheckPoint(true);
+        checkPoints.add(grid.get(5).get(11));
+
         grid.get(21).get(26).setCheckPoint(true);
+        checkPoints.add(grid.get(21).get(26));
 
         grid.get(24).get(28).setStart(true);
+        checkPoints.add(grid.get(24).get(28));
 
     }
 

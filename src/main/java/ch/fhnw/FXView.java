@@ -264,7 +264,7 @@ class FXView {
                         Algorithm.MPAA.toString()
                 );
         algorithmComboBox = new ComboBox<>(algorithmOptions);
-        algorithmComboBox.setValue(Algorithm.DIJKSTRA.toString());
+        algorithmComboBox.setValue(Algorithm.A_STAR.toString());
 
         Text allowDiagonalText = new Text("Allow diagonal?");
         RadioButton allowDiagonalRadioButton = new RadioButton("Yes");
@@ -359,6 +359,8 @@ class FXView {
         });
     }
 
+    // ---------------------------- Getters and Setters ----------------------------------------
+
     ToggleGroup getMapTypeToggleGroup() {
         return mapTypeToggleGroup;
     }
@@ -417,6 +419,22 @@ class FXView {
 
     Button getStepButton() {
         return stepButton;
+    }
+
+    public CheckBox getNoveltyCheckbox() {
+        return noveltyCheckbox;
+    }
+
+    public CheckBox getHappinessCheckbox() {
+        return happinessCheckbox;
+    }
+
+    public CheckBox getExplorationCheckbox() {
+        return explorationCheckbox;
+    }
+
+    public CheckBox getConfidenceCheckbox() {
+        return confidenceCheckbox;
     }
 
     void appendOutputText(String text) {

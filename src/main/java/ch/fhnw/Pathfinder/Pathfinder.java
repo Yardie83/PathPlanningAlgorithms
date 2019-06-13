@@ -21,6 +21,11 @@ public abstract class Pathfinder {
     Cell currentCell;
     ArrayList<Cell> path;
 
+    boolean noveltyActive;
+    boolean happyActive;
+    boolean explorationActive;
+    boolean confidenceActive;
+
     public void init() {
         isRunning = true;
         openList = new ArrayList<>();
@@ -30,8 +35,6 @@ public abstract class Pathfinder {
         path = new ArrayList<>();
         lastCell = currentCell;
     }
-
-    ;
 
 
     public abstract void step();
@@ -113,6 +116,22 @@ public abstract class Pathfinder {
         this.allowDiagonals = allowDiagonals;
     }
 
+    public void setHappyActive(boolean happyActive) {
+        this.happyActive = happyActive;
+    }
+
+    public void setNoveltyActive(boolean novelyActive) {
+        this.noveltyActive = novelyActive;
+    }
+
+    public void setExplorationActive(boolean explorationActive) {
+        this.explorationActive = explorationActive;
+    }
+
+    public void setConfidenceActive(boolean confidenceActive) {
+        this.confidenceActive = confidenceActive;
+    }
+
     public void setAllowCrossingCorners(boolean allowCrossingCorners) {
         this.allowCrossingCorners = allowCrossingCorners;
     }
@@ -122,4 +141,5 @@ public abstract class Pathfinder {
     }
 
     public abstract ArrayList<Cell> getLocalPath();
+
 }

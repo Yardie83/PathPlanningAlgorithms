@@ -60,13 +60,6 @@ public class AStar extends Pathfinder {
             isRunning = false;
             return;
         }
-        System.out.println("============= START ==============================");
-        System.out.println("CurrentCell: " + currentCell.getIndex().i + ":" + currentCell.getIndex().j);
-        if (isNeighbour) {
-            currentCell = getLowestDistanceCell();
-            System.out.println(currentCell);
-            System.out.println("New lowest: " + currentCell.getIndex().i + ":" + currentCell.getIndex().j);
-        }
 
         if (currentCell != null) {
             currentCell.setRobotPosition(true);
@@ -101,22 +94,23 @@ public class AStar extends Pathfinder {
                     return;
                 }
             }
-            System.out.println("============= NOT Returned PATH ======================");
             isNeighbour = true;
+        }
 
-            currentCell.setRobotPosition(false);
-            currentCell.setVisited(true);
-            localPath.add(currentCell);
-            lastCell = (Cell) currentCell.clone();
-            map.getGrid().forEach(cells ->{cells.forEach(cell -> {
-                cell.setRobotPosition(false);
-                if (cell.sameIndex(lastCell)){
-                    cell.setRobotPosition(true);
-                }
-            });} );
+        currentCell.setCameFrom(new Pair<>(robotCell.getIndex().i, robotCell.getIndex().j));
+        robotCell = currentCell;
 
-            openList.remove(currentCell);
-            closedList.add(currentCell);
+        if (noveltyActive) {
+            incrementNoveltyCellValue(currentCell);
+        }
+
+        if (!(localPath.get(localPath.size() - 1).getIndex().i == robotCell.getIndex().i && localPath.get(localPath.size() - 1).getIndex().j == robotCell.getIndex().j)) {
+            localPath.add((Cell) robotCell.clone());
+        }
+
+        currentCell.setVisited(true);
+        openList.remove(currentCell);
+        closedList.add(currentCell);
 
             checkForCheckPoint();
             if (checkForLastCheckPoint()) return;
@@ -134,14 +128,18 @@ public class AStar extends Pathfinder {
 
     private void checkForCheckPoint() {
         if (checkPointFound(currentCell)) {
+
             map.getGrid().forEach(cells -> cells.forEach(cell -> {
                 if (cell.isStart()) {
                     cell.setStart(false);
                 }
             }));
 
+            currentCell.setStart(true);
+
             openList.clear();
             closedList.clear();
+
             openList.add(currentCell);
 
             map.getGrid().forEach(cells -> cells.forEach(cell -> cell.setVisited(false)));
@@ -161,6 +159,11 @@ public class AStar extends Pathfinder {
         });
     }
 
+    private void incrementNoveltyCellValue(Cell currentCell) {
+        if (!currentCell.isStart()) {
+            currentCell.setF_score(currentCell.getF_score() + 1.5);
+        }
+    }
 
     private Cell getLowestDistanceCell() {
         Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getF_score));

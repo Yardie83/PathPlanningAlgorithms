@@ -141,8 +141,6 @@ class FXController {
     private boolean simulationSetup() {
         //     Get all the user options (Emotion options, Simulation options)
 
-//        Emotion options
-
 //        Simulation options
         String algorithm = view.getAlgorithmComboBox().getSelectionModel().getSelectedItem();
         boolean allowDiagonals = (boolean) view.getAllowDiagonalToggleGroup().getSelectedToggle().getUserData();
@@ -155,6 +153,13 @@ class FXController {
             pathfinder.setAllowDiagonals(allowDiagonals);
             pathfinder.setAllowCrossingCorners(true);
             pathfinder.setHeuristic(heuristic);
+
+            //Emotion options
+            pathfinder.setNoveltyActive(view.getNoveltyCheckbox().isSelected());
+            pathfinder.setHappyActive(view.getHappinessCheckbox().isSelected());
+            pathfinder.setExplorationActive(view.getExplorationCheckbox().isSelected());
+            pathfinder.setConfidenceActive(view.getConfidenceCheckbox().isSelected());
+
             if (map == null) {
                 view.appendOutputText("Generate a map first" + "\n");
 //                return;

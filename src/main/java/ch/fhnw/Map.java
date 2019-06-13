@@ -90,6 +90,7 @@ public class Map {
             grid.get(13).get(i).setWall(true);
         }
         grid.get(10).get(30).setCheckPoint(true);
+
         grid.get(50).get(9).setCheckPoint(true);
         grid.get(1).get(63).setCheckPoint(true);
 

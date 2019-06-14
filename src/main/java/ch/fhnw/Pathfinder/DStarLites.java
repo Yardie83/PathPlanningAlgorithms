@@ -141,4 +141,19 @@ public class DStarLites extends Pathfinder {
     public ArrayList<Cell> getLocalPath() {
         return null;
     }
+
+    @Override
+    public double getTotalTime() {
+        return 0;
+    }
+
+    @Override
+    public int getBumps() {
+        return 0;
+    }
+
+    @Override
+    public int getSteps() {
+        return 0;
+    }
 }

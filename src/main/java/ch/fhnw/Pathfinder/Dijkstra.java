@@ -56,6 +56,21 @@ class Dijkstra extends Pathfinder {
         return null;
     }
 
+    @Override
+    public double getTotalTime() {
+        return 0;
+    }
+
+    @Override
+    public int getBumps() {
+        return 0;
+    }
+
+    @Override
+    public int getSteps() {
+        return 0;
+    }
+
     private Cell getLowestDistanceCell() {
         Optional<Cell> minDistanceCell = openList.stream().min(Comparator.comparing(Cell::getDistance));
         return minDistanceCell.orElse(null);

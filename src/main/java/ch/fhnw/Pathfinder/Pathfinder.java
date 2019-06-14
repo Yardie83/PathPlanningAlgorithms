@@ -142,4 +142,10 @@ public abstract class Pathfinder {
 
     public abstract ArrayList<Cell> getLocalPath();
 
+    public abstract double getTotalTime();
+
+    public abstract int getBumps();
+
+    public abstract int getSteps();
+
 }

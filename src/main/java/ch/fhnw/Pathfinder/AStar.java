@@ -108,7 +108,7 @@ public class AStar extends Pathfinder {
 
             updateNeighbours();
         }
-
+        System.out.println("[Steps] : " + steps);
     }
 
 
@@ -170,6 +170,7 @@ public class AStar extends Pathfinder {
     private boolean checkForLastCheckPoint() {
         if (lastCheckPointFound()) {
             calculateFinalValues();
+            steps = steps - 1;
             return true;
         }
         return false;
@@ -204,6 +205,7 @@ public class AStar extends Pathfinder {
             openList.clear();
             closedList.clear();
             openList.add(currentCell);
+            steps = steps - 1;
 
             map.getGrid().forEach(cells -> cells.forEach(cell -> cell.setVisited(false)));
         }

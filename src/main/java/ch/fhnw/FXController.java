@@ -187,11 +187,14 @@ class FXController {
         view.updateMap();
         ArrayList<Cell> shortestPath = pathfinder.getLocalPath();
         if (shortestPath != null) {
-            view.appendOutputText("[ShortestPath]" + "\n");
-            shortestPath.forEach(cell -> view.appendOutputText(cell.getIndex().i + "," + cell.getIndex().j + "->"));
-            view.appendOutputText("\n[Number of steps] " + (shortestPath.size() - 1));
+            //view.appendOutputText("[ShortestPath]" + "\n");
+            //shortestPath.forEach(cell -> view.appendOutputText(cell.getIndex().i + "," + cell.getIndex().j + "->"));
+            view.appendOutputText("\n[Number of steps] " + pathfinder.getSteps());
             view.setPath(shortestPath);
             view.drawPath();
+            view.appendOutputText("\n[Total Time] " + pathfinder.getTotalTime());
+            view.appendOutputText("\n[Total Bumps] " + pathfinder.getBumps());
+
         } else {
             view.appendOutputText("No path found" + "\n");
         }
